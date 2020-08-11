@@ -4,7 +4,12 @@ require(`dotenv`).config({
 
 module.exports = {
   siteMetadata: {
-    siteTitleAlt: `Minimal Blog - Gatsby Theme`,
+    siteTitle: `Dr. Will Faithfull`,
+    siteTitleAlt: `Dr. Will Faithfull`,
+    siteHeadline: `Dr. Will Faithfull`,
+    siteUrl: `https://will.faithfull.me`,
+    siteDescription: `Personal website of Dr. Will Faithfull`,
+    siteLanguage: `en`
   },
   plugins: [
     {
@@ -24,12 +29,12 @@ module.exports = {
         externalLinks: [
           {
             name: `Twitter`,
-            url: `https://twitter.com/lekoarts_de`,
+            url: `https://twitter.com/DrFaithfull`,
           },
           {
-            name: `Instagram`,
-            url: `https://www.instagram.com/lekoarts.de/`,
-          },
+            name: `LinkedIn`,
+            url: `https://www.linkedin.com/in/will-faithfull/`,
+          }
         ],
       },
     },
@@ -66,5 +71,14 @@ module.exports = {
     },
     `gatsby-plugin-offline`,
     `gatsby-plugin-netlify`,
+    {
+      resolve: `gatsby-transformer-remark`,
+      options: {
+        extensions: [`.mdx`],
+        plugins: [
+          `gatsby-remark-mathjax`,
+        ],
+      },
+    },
   ],
 }

@@ -1,0 +1,255 @@
+---
+title: "Change Detection for Software Engineers Part I : Introduction and CUSUM"
+date: 2017-05-03
+slug: "/change-detection-for-software-engineers-part-i-introduction-and-cusum"
+tags:
+    - java
+    - cd
+---
+I've decided to force myself into the habit of blogging about my PhD topic, in the hope that people who find these posts have an easier time comprehending the subject matter than I did. This, and future posts, will attempt to focus on a particular method at a time. I will present the maths for reference, but generally speaking the explanations will use as little maths as possible. My hope is that this will be at a digestible level for software engineers who have a practical interest in these techniques.
+
+What is the topic? Change Detection, specifically in streaming data. If that sounds like a pretty broad area to you, then you're absolutely right. We have a little bit of ground to cover first to explain what I mean by Change Detection and how it relates to other similar things we could do. 
+
+##### Background
+I will assume that you have some data that you collect incrementally. Let's say you record the time taken to process every request in your web application. You'd like to be alerted if there's a significant change in the average time taken to process a request - increases may indicate a DDoS, decreases may mean an error is causing requests to bail out prematurely.
+
+What you have here is a data stream. We can write that like so:
+
+$$ 
+X = \left \\{ \vec{x}\_1, \vec{x}\_2, ... \right \\}
+$$
+
+So, $ \vec{x}\_t $ is a piece of data arriving at time $t$. The little arrow above the $x$ means that this is a vector, i.e. the piece of data could have one or more elements.
+
+Anyway, we collect the request times for our web app. At midnight, a group of Russian hackers decide to pwn you with a botnet. Request completion times start to increase. Clearly this will be reflected in the data we collect. We will have what is called a **Change Point** at 12:00.
+
+How do we define a change point? The data we are observing is changing in response to something. This purely conceptual "something" is what we call a **Data Source** (*Class*, *Concept*). We say that before the event is one data source $S\_1$, and after the event is another, $S\_2$. Therefore, a change point is where there is a switch from one data source to another. Our change point at time $t$ is denoted by:
+
+$$\left \\{ ..., \vec{x}\_{t-2}, \vec{x}\_{t-1} \right \\} \in S_1$$
+
+$$\left \\{ \vec{x}\_{t}, \vec{x}\_{t+1}, ... \right \\} \in S_2$$
+
+($\in$ *is used here to mean 'is drawn from'*) 
+
+Change Detection then, is to detect that $S\_1$ has changed to $S\_2$ as soon as possible after $t$. We don't know what's caused the change, and we don't know what that change will look like in the data. This isn't a classification problem, and we don't have any prior knowledge, heuristics or training data to help us.
+
+If you decide to read around this subject, you'll quickly become confused about what the boundary is between this and
+
+* Anomaly Detection
+* Novelty Detection
+* Outlier Detection
+* Change Point Detection
+* Concept Drift Detection
+
+That's a story for another blog post. Just know that Change Detection *is* subtly different, and the methods we use are often cross-applicable. These each refer to a very similar problem with slightly tweaked context.
+##### CUSUM
+Ok, I think we've covered enough to get started now. We're going to implement a simple form of **Cumulative Sum** (**CUSUM**) to detect significant changes in the mean of our input data.
+
+CUSUM is a technique for Sequential Analysis, which means it processes data one-at-a-time (sequentially) and it makes a decision about whether to continue. Remember our data stream:
+
+$$ X = \left \\{ \vec{x}\_1, \vec{x}\_2, ... \right \\}$$
+
+For each observation, we calculate a sum, and add it to the sum from the previous step. That is what makes it cumulative. The CUSUM procedure is:
+
+$$ g_0 = 0 $$
+$$ g\_{t+1} = max(0,g\_t + x\_t - \omega\_t)$$
+
+Where $x_t$ is our observation, $g\_t$ is the cumulative sum at time $t$ and $\omega\_t$ is our target value at time $t$.
+
+We're also going to define a threshold, $\lambda$ such that:
+
+$$H_1 \text{ if } g\_t > \lambda \text{ (else } H\_0\text{)}$$
+
+or in plain english,
+
+$$\text{change if } g\_t > \lambda \text{ (else continue)}$$
+
+That's still a bit abstract - how do we get $\omega_t$, our target value? If we had all the data in advance, we could make this the mean. In the figure below, I've taken the mean and standard deviation of the first 25 data points as the basis for the CUSUM chart on the right. 
+![](/content/images/2017/10/cusum.png)
+
+You can see that what we end up with is an accumulation of the *differences* between the observed value and the target value. If this stacks up too high, we signal change. That's all there is to it. In this CUSUM chart, I used $5\sigma$ as the threshold.
+
+In our request monitoring scenario, we're dealing with streaming data and we don't have anything in advance to calculate a mean. We're therefore going to approximate a mean as we go ($\mu$) and make *that* the target value. We'll also add an extra parameter, $\delta$, to specify the magnitude of change we find acceptable, ending up with:
+
+$$ g\_{t+1} = max(0,g\_t + x\_t - \mu - \delta)$$
+
+Enough abstract stuff, let's write some code. For a start, we can define an interface for our change detection process.
+
+```java
+public interface ChangeDetector<T> {
+
+    /**
+     * Provide the next item in the stream
+     * @param observation the next item in the stream
+     */
+    void update(T observation);
+
+    /**
+     * Did the detector signal change at the last item?
+     * @return true, if it did.
+     */
+    boolean isChange();
+
+    /**
+     * Has the detector seen enough items to detect change?
+     * @return true, if it has.
+     */
+    boolean isReady();
+
+    /**
+     * Reset the detector, wiping any memory component it retains.
+     */
+    void reset();
+
+}
+```
+
+And then putting our CUSUM detector together, we need to implement `ChangeDetector<Double>`, because we will take a single numeric value at each time step.
+
+```java
+public class CUSUMChangeDetector implements ChangeDetector<Double> {
+
+    private final static double DEFAULT_MAGNITUDE = 0.05;
+    private final static double DEFAULT_THRESHOLD = 3;
+    private final static long DEFAULT_READY_AFTER = 50;
+
+    private double cusumPrev = 0;
+    private double cusum;
+    private double magnitude;
+    private double threshold;
+    private double magnitudeMultiplier;
+    private double thresholdMultiplier;
+    private long   readyAfter;
+
+    private long   observationCount = 0;
+    private double runningMean      = 0.0;
+    private double runningVariance = 0.0;
+
+    private boolean change = false;
+
+    /**
+     * Create a CUSUM detector
+     * @param magnitudeMultiplier Magnitude of acceptable change in stddevs
+     * @param thresholdMultiplier Threshold in stddevs
+     * @param readyAfter Number of observations before allowing change to be signalled
+     */
+    public CUSUMChangeDetector(double magnitudeMultiplier, 
+                               double thresholdMultiplier, 
+                               long readyAfter) {
+        this.magnitudeMultiplier = magnitudeMultiplier;
+        this.thresholdMultiplier = thresholdMultiplier;
+        this.readyAfter = readyAfter;
+    }
+
+    public CUSUMChangeDetector() {
+        this(DEFAULT_MAGNITUDE, DEFAULT_THRESHOLD, DEFAULT_READY_AFTER);
+    }
+
+    @Override
+    public void update(Double xi) {
+        ++observationCount;
+
+        // Instead of providing the target mean as a parameter as 
+        // we would in an offline test, we calculate it as we go to 
+        // create a target of normality.
+        double newMean = runningMean + (xi - runningMean) / observationCount;
+        runningVariance += (xi - runningMean)*(xi - newMean);
+        runningMean = newMean;
+        double std = Math.sqrt(runningVariance);
+
+        magnitude = magnitudeMultiplier * std;
+        threshold = thresholdMultiplier * std;
+
+        cusum = Math.max(0, cusumPrev +(xi - runningMean - magnitude));
+
+        if(isReady()) {
+            this.change = cusum > threshold;
+        }
+
+        cusumPrev = cusum;
+    }
+
+    @Override
+    public boolean isChange() {
+        return change;
+    }
+
+    @Override
+    public boolean isReady() {
+        return this.observationCount >= readyAfter;
+    }
+
+    public void reset() {
+        this.cusum = 0;
+        this.cusumPrev = 0;
+        this.runningMean = 0;
+        this.observationCount = 0;
+    }
+
+}
+```
+
+Now, using the power of spring boot, let's plug this into monitoring some request times. I'm not going to paste the code in here, but I've provided a full example in [this git repository](https://github.com/wfaithfull/cd4soft).
+
+I have written the following test to assert that our detector can spot a change:
+
+```java
+
+@Test
+public void changeDetectionTest() throws Exception {
+    for(int i=0;i<200;i++) {
+        mockMvc.perform(MockMvcRequestBuilders.get("/data"))
+                .andExpect(status().isOk());
+        Assert.assertFalse(detector.isChange());
+    }
+
+    int at = 0;
+    boolean detected = false;
+
+    long delay = 0;
+    for(int i=0;i<1000;i++) {
+
+        // Introduce abrupt change
+        if(i % 100 == 0) {
+            delay += 100;
+            provider.setDelay(delay);
+            log.info("Artificially slowed requests by {}ms", delay);
+        }
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/data"))
+                .andExpect(status().isOk());
+
+        if(detector.isChange()) {
+            at = i;
+            detected = true;
+            break;
+        }
+    }
+
+    Assert.assertTrue(detected);
+    if(detected) {
+        log.info("Detected change {} observations after change point", at);
+    }
+}
+```
+
+If you go and run the example test, you will see something like this:
+
+```
+2017-10-03 10:29:40.923  INFO 19836 --- [           main] me.faithfull.cd4soft.DataControllerTest  : Artificially slowed requests by 100ms
+2017-10-03 10:29:42.146  INFO 19836 --- [           main] m.f.cd4soft.ChangeDetectionService       : CHANGE DETECTED! Time to send a midnight page to the sysadmin. Anomalous value: 102
+2017-10-03 10:29:42.146  INFO 19836 --- [           main] me.faithfull.cd4soft.DataControllerTest  : Detected change 11 observations after change point
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.565 sec - in me.faithfull.cd4soft.DataControllerTest
+```
+
+And that's a basic and practical CUSUM.
+
+###### Addendum
+
+I'm well aware that CUSUM may not be the best suited change detection approach for this particular problem, it is however a very simple approach applied to a very common practical problem. That is the tack I wish to take in this series because I feel it aids understanding.
+
+If you are modelling change in request times, you may wish to model them as a Poisson process, and investigate it's evolution.
+
+###### Credits
+
+Thanks to Jon Snyder and Dan Silverglate, who pointed out a bug in the calculation of the variance within the `CUSUMChangeDetector` class.

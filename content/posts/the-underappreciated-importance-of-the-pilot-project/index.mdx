@@ -1,0 +1,20 @@
+---
+title: "The underappreciated importance of the pilot project"
+date: 2016-11-14
+slug: "/the-underappreciated-importance-of-the-pilot-project"
+tags:
+    - philosophy
+---
+
+
+If a lot of developer CVs pass over your desk, you'll be familiar with the idea of the 'polygot' developer - that is; the developer who is proficient in lots of languages, frameworks, paradigms, whatever. The full stack++ engineer. Personally, I think this is a little overblown. Especially early in your career, specialisation makes it easier to apply learned knowledge and avoid repeating your mistakes.
+
+However, common knowledge dictates that you should always try to use the right tool for the job. Inevitably at some point you will start a project using something with which you have no experience, but your research indicates that you should be using. What should you do then? Just dive straight in and start hacking, or plan meticulously and read up about all the implementation details and pitfalls beforehand so that you can avoid them? By diving straight in, you gain proficiency quickly, but accrue a lot of technical debt which you then have to clean up later. By being cautious, you put off proficiency in favour of avoiding technical debt, but you simply can't predict and avoid all of it.
+
+The tack I like to take is slightly different, and cuts a balance between the two. I'm also an academic. What we do when we're about to write a big paper is a **pilot experiment**. That is; a stripped down, minimal taster of what we are soon going to do on a larger scale. We look at the results of the pilot experiment and the way we set it up, and evaluate how well that worked. The same concept can be stolen for software engineering. Don't start on the actual project. Start a **pilot project**. When asked about an existing project, almost every developer will tell you that they would do things differently if they were starting from scratch. A pilot project gives you a sandbox where you can freely make mistakes and evaluate what will work in the long term and what won't. When you've been around the block once, then you can plan out the real thing. The fact that you appear to be working on something that is tangential to the main project can irk upper management. Here are some pointers on how to make sure it is worthwhile to the business:
+
+* **Don't build [Main Project]-lite**: It doesn't need to be a 'lite' version of the same problem. Just make sure it's a *small* project, and use *exactly* the same stack.
+* **Don't half-ass it**: Actually take the time to see it through. If you invest two weeks or even more now, you will almost certainly reap that time back in the technical debt you avoid through experience.
+* **Make it relevant**: Ask your colleagues if there are any problems, which do not urgently need to be automated, but made into an application would benefit the business.
+
+Practical example: at Infinity, we want to build a web interface for a considerably complex service. After evaluation of our needs, we decided that we would build this in **Angular 2**. Since we are all Java developers, with scant front-end experience, I scoped out ideas for a pilot project and it transpired that we would like a better solution for tracking customer warranties. Since we have a lot of experience with Java back-ends, it only took a day to draw up a simple domain model, and set up a persistent REST API with Spring Data REST and PostgreSQL. Now, we've almost finished developing the pilot front end. We've solved an existing problem and have accrued all that experience to feed back into our main project. 
