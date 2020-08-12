@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+<url> <loc>https://will.faithfull.me/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/blog</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/tags</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/linear-congruential-generators-and-uniqueness</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/pca-feature-extraction</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/feature-contributions-from-pca</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/reflections-on-submission</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/using-pca-when-there-are-less-samples-than-dimensions</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/recursive-statistics-for-data-streams</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/change-detection-for-software-engineers-part-i-introduction-and-cusum</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/overriding-spring-data-rest-repositories</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/the-underappreciated-importance-of-the-pilot-project</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/back-to-mvvm</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/about</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/tags/academia</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/tags/cd</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/tags/csharp</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/tags/data-science</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/tags/java</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/tags/matlab</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/tags/phd</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/tags/philosophy</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/tags/rng</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/tags/spring</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/tags/spring-data-rest</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://will.faithfull.me/tags/statistics</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+</urlset>
