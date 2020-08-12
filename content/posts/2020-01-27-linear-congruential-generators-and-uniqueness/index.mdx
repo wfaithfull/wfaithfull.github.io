@@ -1,0 +1,55 @@
+---
+title: "Linear Congruential Generators and Uniqueness"
+date: 2020-01-27
+slug: "/linear-congruential-generators-and-uniqueness"
+tags:
+    - rng
+    - data-science
+---
+
+I am not an expert in number theory, or PRNGs for that matter. I am sometimes forced to do a little academic digging to solve a particular problem. So it was with Linear Congruential Generators or LCGs. I thought I would write up what I found, so that it might be easier for the next person to find what they need.
+
+### LCGs
+
+LCGs are a particular class of psuedorandom number generating algorithms, which are cryptographically insecure, but fast and simple. The latter two points continue to make them attractive for a number of use cases.
+
+An LCG takes the following general form:
+
+$$X_{n+1} = (aX_n + c) \mod m$$
+
+Now let's say you have a PRNG of this form, and you are concerned about it's *uniqueness*, it's *cycle* or it's *period* to throw out a few terms people use to talk about the same thing.
+
+Specifically, we would like to know whether we will get any repeated integers or not. And if we do, when will it happen?
+
+Fortunately, these properties are well understood for LCGs. If your PRNG looks like the above equation (remember $a$ might be 1), then the following is applicable.
+
+### Full cycle
+
+What we are interested in is called the [*full cycle*](https://en.wikipedia.org/wiki/Full_cycle) of a PRNG. A PRNG has a full cycle if for any seed, it will traverse every valid state before returning to the seed state. In this particular case, state refers to the integers.
+
+My PRNG might have the following valid states:
+
+```
+0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+```
+
+So, if it had a full cycle, whatever number I seed it with, over 10 iterations it will generate the numbers 0-9 in a psuedorandom order, with no repetitions.
+
+### Conditions for full cycle in LCGs
+
+Now to the crux. If we want an LCG to have a full cycle of size $m$, we can follow a proven theorem (the Hull-Dobell theorem[1]) to guarantee this. Your LCG parameters must pass the following tests:
+
+1. $m$ and $c$ must be coprime.
+2. $a-1$ must be divisible by all prime factors of $m$
+3. $a-1$ must be divisible by 4 if $m$ is divisible by 4.
+
+So for example, for parameters m = 1000, a = 1, c = 1049
+
+1. $gcd(1000,1049) = 1$, so $m$ and $c$ are coprime.
+2. $a-1 = 0$, $0$ is divisible by everything.
+3. $mod(1000,4) = 0$, but $a-1 = 0$ and $0$ is divisible by everything.
+
+In this instance, we're all good. The generator will cycle through the numbers 1-1000 pseudorandomly for any given seed value.
+
+
+[1] Hull, Thomas E., and Alan R. Dobell. "Random number generators." SIAM review 4.3 (1962): 230-254.
