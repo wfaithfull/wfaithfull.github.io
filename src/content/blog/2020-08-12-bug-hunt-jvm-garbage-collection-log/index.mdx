@@ -1,0 +1,98 @@
+---
+title: "Bug hunt: JVM garbage collection log"
+date: 2020-08-12
+slug: "/bug-hunt-jvm-garbage-collection-log"
+tags:
+    - bug-hunt
+    - java
+    - ops
+---
+
+I spent some time in a platform engineering team earlier this year, and man was it fun. It sometimes feels like you're a digital detective, playing a high stakes game to track down the source of an issue.
+Not all issues are super obscure, but this one was, and it was fascinating.
+
+#### Setting the scene
+
+Our alerts informed us that a node was running out of disk space. This happens from time-to-time and is usually indicitive of
+a slightly under-zealous log rotation policy. Expectation was that we could clear some logs and tweak the rotation config.
+
+However, when we inspected the node, we found the root disk saturated with JVM crash dumps.
+
+This box used `logstash` for log shipping, and `logrotate` for log truncation.
+
+We did find one odd thing - an application on this node was writing a JVM garbage collection log (`gc.log`)
+which was fairly large, but not suspiciously so. Upon inspecting this log file, we found that almost all 
+of it was unintelligable garbage that looked like this in `less`:
+
+```bash
+$ less gc.log
+^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@
+^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@
+^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@
+```
+
+
+
+#### The problem
+
+For us, this was because `logrotate` and the JVM were both trying to write the file without a lock. JVM garbage collection logs appear to be special insofar as they're written directly from the JVM itself into the file. What happens is that the JVM keeps a handle to this file, and a location within it where it writes logs to. 
+
+`^@` is actually just a null byte in your file. You can see this if you run `hexdump -C your_gc.log`. What causes these null bytes is the interesting part - `logrotate` truncating the file. 
+
+```bash
+$ hexdump -C gc.log | head -3
+00000000  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+061ca010  00 00 00 00 00 00 00 32  30 32 30 2d 30 37 2d 30  |.......2020-07-0|
+```
+
+This only surfaced for us because we were using Logstash to monitor the GC log. Logstash was crashing with `OutOfMemoryError` every time `logrotate` ran, and from inspecting heap dumps, we noticed that logstash was trying to ship a HUGE (600MB in JVM internal memory) log line that looked like:
+
+```
+{ "message": "\u0000\u0000\u0000...
+```
+
+In this case, because logstash escapes the nulls to unicode (6 characters), and each character is represented as UTF-16 internally in the JVM, this means the on-heap encoding of this is a whopping factor of 12 larger than the null bytes on disk. So it takes a smaller log than you would expect to run out of memory.
+
+This lead us to find the nulls in the garbage collection log, and where they came from:
+
+##### 1. JVM happily writing logs
+```
+*-------------------------*
+^                         ^
+JVM's file start          JVM's current location
+```
+
+##### 2. logrotate has entered the game
+```
+                         **
+\________________________/
+^                    |    ^
+JVM's file start     |    JVM's current location
+                     |
+                     logrotate copies contents elsewhere and truncates file
+                     to zero-length
+```
+
+
+##### 3. JVM keeps writing
+```
+*xxxxxxxxxxxxxxxxxxxxxxxxx-*
+\________________________/^^
+^                    |    |JVM's current location
+JVM's file start     |    JVM writes new log
+                     |
+                     File is now zero-length, but JVM still tries to write
+                     to the end, so everything before it's pointer is 
+                     filled in with zeros
+```
+
+#### TL;DR
+
+Don't use `logrotate` to rotate JVM GC logs. It's behaviour does not play nicely with the way the JVM writes the GC log file. The JVM is capable of rotating it's own GC logs, using JVM flags:
+
+* `-XX:+UseGCLogFileRotation` Enables GC log file rotation
+* `-XX:NumberOfGCLogFiles=5` Will tell the JVM to keep 5 rotated files
+* `-XX:GCLogFileSize=20M` Will tell the JVM to rotate when the file reaches 20M
+
+

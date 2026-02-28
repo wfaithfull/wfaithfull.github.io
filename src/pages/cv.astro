@@ -1,0 +1,375 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const experience = [
+  {
+    company: 'ExaDev',
+    url: 'https://exadev.io',
+    duration: '2013 - Present',
+    roles: [
+      {
+        title: 'CEO',
+        period: 'Oct 2024 - Present',
+        location: 'Lancaster',
+        description: 'Grown ExaDev from 2 graduate students in a bedroom to a 17-strong software consultancy, Google supplier, and serial startup practice in SaaS, AI, and Fintech across the UK, US, Australia and Germany.',
+      },
+      {
+        title: 'CEO / Principal Engineer',
+        period: 'Sep 2015 - Oct 2024',
+        location: 'Lancaster',
+        description: '95% Engineer, 5% CEO.',
+      },
+      {
+        title: 'Co-Founder / CTO',
+        period: 'Sep 2013 - Sep 2015',
+        location: 'Bangor',
+      },
+    ],
+  },
+  {
+    company: 'Various Startups',
+    note: 'via ExaDev',
+    duration: '2020 - Present',
+    roles: [
+      {
+        title: 'fCTO',
+        period: 'Sep 2020 - Present',
+        location: 'San Francisco, London, Manchester',
+        description: 'Advising, consulting, coaching, leading, and getting hands dirty in the code. The tech startups we\'ve worked with in the UK, US and Australia have raised collectively over \u00a377m in rounds from Seed to Series A+.',
+      },
+    ],
+  },
+  {
+    company: 'Google',
+    duration: '2024',
+    roles: [
+      {
+        title: 'Software Engineer, Opal',
+        note: 'via ExaDev',
+        period: 'Mar 2024 - Jul 2024',
+        location: 'Google Labs',
+        description: 'Contractor contributing to breadboard / Opal for Google Labs.',
+        url: 'https://opal.withgoogle.com',
+      },
+    ],
+  },
+  {
+    company: 'HM Revenue & Customs',
+    note: 'via ExaDev and Equal Experts',
+    duration: '2020 - 2024',
+    roles: [
+      {
+        title: 'Consultant / Advisor',
+        period: 'Mar 2024 - Oct 2024',
+        location: 'London',
+        description: 'Ad-hoc advisor on data engineering and data science.',
+      },
+      {
+        title: 'Data Science & Engineering Tech Lead',
+        period: 'Jun 2022 - Mar 2024',
+        location: 'London',
+        description: 'Technical lead of a data science and engineering team delivering petabyte-scale insights and predictive modelling.',
+        tech: ['Python', 'Scala', 'AWS', 'Terraform', 'Spark', 'Hadoop', 'EMR', 'Hudi', 'Airflow', 'Kafka'],
+      },
+      {
+        title: 'Data Scientist',
+        period: 'Mar 2021 - Jun 2022',
+        location: 'London',
+        description: 'Part of the digital team delivering national COVID schemes including Job Retention, Statutory Sick Pay, Self Employment Income Support and Eat Out to Help Out.',
+      },
+      {
+        title: 'Data Engineer',
+        period: 'Apr 2020 - Mar 2021',
+        location: 'London',
+        description: 'Software engineering, data science and machine learning at petabyte scale.',
+      },
+      {
+        title: 'Java Developer in Data Engineering',
+        period: 'Jan 2020 - Apr 2020',
+        location: 'Manchester',
+        tech: ['Java 11', 'AWS', 'Neo4J', 'Terraform', 'Ansible', 'Spark'],
+      },
+    ],
+  },
+  {
+    company: 'Equal Experts',
+    note: 'via ExaDev',
+    duration: '2019 - 2024',
+    roles: [
+      {
+        title: 'Associate',
+        period: 'Nov 2019 - Feb 2024',
+        location: 'Manchester',
+        description: 'ExaDev is an associate provider of Equal Experts, a network of experienced software consultants specialising in agile delivery.',
+      },
+    ],
+  },
+  {
+    company: 'Sky',
+    note: 'via ExaDev',
+    duration: '2019',
+    roles: [
+      {
+        title: 'Senior Java Developer',
+        period: 'Apr 2019 - Sep 2019',
+        location: 'Leeds',
+        description: 'Working on Identity, managing authentication and authorisation for all Sky products, handling millions of concurrent connections. Built for NBCU\'s Peacock streaming platform.',
+        tech: ['Java', 'Scala', 'Groovy', 'Kubernetes'],
+      },
+    ],
+  },
+  {
+    company: 'Infinity Business Advancement Systems',
+    duration: '2015 - 2019',
+    roles: [
+      {
+        title: 'Technical Lead',
+        period: 'Oct 2015 - Mar 2019',
+        location: 'Cardiff',
+        description: 'Technical lead of a 4-person Java development team. MASONIX Android application and infrastructure. HATEOAS Spring MVC / Spring Boot back-ends with Hibernate and PostgreSQL. Angular 2 with TypeScript front-ends. Deployments orchestrated on Kubernetes.',
+      },
+    ],
+  },
+  {
+    company: 'Sourcepulp Ltd.',
+    duration: '2013 - 2015',
+    roles: [
+      {
+        title: 'Co-founder, CTO',
+        period: 'Jul 2013 - Sep 2015',
+        location: 'Bangor',
+        description: 'Precursor to ExaDev. Robotics control systems for medical lab equipment, patient record systems, cloud photogrammetry, and medical biometric data platforms.',
+        tech: ['C#', 'WPF', 'ASP.NET', 'Python', 'Java', 'Android'],
+      },
+    ],
+  },
+  {
+    company: 'Bangor University',
+    duration: '2011 - 2015',
+    roles: [
+      {
+        title: 'Senior Demonstrator',
+        period: '2011 - Sep 2015',
+        location: 'Bangor',
+        description: 'Computer science lecturing and lab demonstration. Taught LaTeX, Java, C#, System Administration, Advanced Java, Pattern Recognition and Neural Networks.',
+      },
+    ],
+  },
+  {
+    company: 'Betsi Cadwaladr University Health Board',
+    duration: '2014',
+    roles: [
+      {
+        title: 'Senior Developer',
+        period: 'Apr 2014 - Sep 2014',
+        location: 'Bangor',
+        description: 'Lead development of a proof-of-concept smart ward system.',
+      },
+    ],
+  },
+  {
+    company: 'BEE Robotics',
+    duration: '2013 - 2014',
+    roles: [
+      {
+        title: 'Lab Robotics Software Developer',
+        period: 'Jul 2013 - Mar 2014',
+        location: 'Caernarfon',
+        description: 'Developed control software for the RoboBlot / RoboScreen strip-based assay processing robots. Touchscreen C# WPF application interfacing with hardware components.',
+      },
+    ],
+  },
+];
+
+const education = [
+  {
+    institution: 'Bangor University',
+    degree: 'Doctor of Philosophy (Ph.D.), Computer Science',
+    period: '2011 - 2018',
+    note: 'Part-time, concurrent with founding ExaDev',
+  },
+  {
+    institution: 'Bangor University',
+    degree: 'BSc (Hons), Computer Science',
+    period: '2008 - 2011',
+  },
+];
+
+const publications = [
+  {
+    title: 'PCA feature extraction for change detection in multidimensional unlabeled data',
+    authors: 'LI Kuncheva, WJ Faithfull',
+    venue: 'IEEE Transactions on Neural Networks and Learning Systems 25 (1), 69-80',
+    citations: 274,
+    year: 2013,
+  },
+  {
+    title: 'Combining Univariate Approaches for Ensemble Change Detection in Multivariate Data',
+    authors: 'WJ Faithfull, JJ Rodríguez, LI Kuncheva',
+    venue: 'Information Fusion',
+    citations: 47,
+    year: 2019,
+  },
+  {
+    title: 'PCA feature extraction for change detection in multidimensional unlabelled streaming data',
+    authors: 'LI Kuncheva, WJ Faithfull',
+    venue: 'Proceedings of the 21st International Conference on Pattern Recognition',
+    citations: 19,
+    year: 2012,
+  },
+  {
+    title: 'SitaVis: Interactive situation awareness visualization of large datasets',
+    authors: 'FCB Williams, WJ Faithfull, JC Roberts',
+    venue: '2012 IEEE Conference on Visual Analytics Science and Technology (VAST)',
+    citations: 7,
+    year: 2012,
+  },
+  {
+    title: 'On optimum thresholding of multivariate change detectors',
+    authors: 'WJ Faithfull, LI Kuncheva',
+    venue: 'Joint IAPR International Workshops on Statistical Techniques in Pattern Recognition',
+    citations: 4,
+    year: 2014,
+  },
+  {
+    title: 'Unsupervised Change Detection in Multivariate Streaming Data',
+    authors: 'WJ Faithfull',
+    venue: 'Bangor University (PhD Thesis)',
+    citations: 3,
+    year: 2018,
+  },
+  {
+    title: 'A Middleware to Link Lego Mindstorms Robots with 4th Generation Language Software NetLogo',
+    authors: 'SK Aslam, WJ Faithfull, WJ Teahan',
+    venue: 'Artificial Intelligence XXXV: 38th SGAI International Conference',
+    citations: 1,
+    year: 2018,
+  },
+];
+
+const awards = [
+  'BCS Prize',
+  'IEEE VAST Challenge Honourable Mention',
+  'Bangor University Entrepreneurial Award',
+  'Bangor University Impact and Innovation Award',
+  'Lancashire Cyber Foundry Skills and Talent Award',
+];
+---
+
+<BaseLayout title="CV — Dr. Will Faithfull" description="Career history, education, publications and awards.">
+  <article class="max-w-3xl mx-auto px-6 py-16 sm:py-20">
+    <div class="mb-12">
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-[var(--color-text-heading)] mb-2">
+        Curriculum Vitae
+      </h1>
+      <p class="text-[var(--color-text-muted)]">
+        Dr. Will Faithfull · Lancaster, England
+      </p>
+    </div>
+
+    <!-- Experience -->
+    <section class="mb-16">
+      <h2 class="text-sm font-mono text-[var(--color-accent)] tracking-wide uppercase mb-8">Experience</h2>
+      <div class="flex flex-col gap-10">
+        {experience.map((employer) => (
+          <div class="border-l-2 border-[var(--color-border)] pl-6">
+            <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 mb-4">
+              <h3 class="text-lg font-bold text-[var(--color-text-heading)]">
+                {employer.url ? (
+                  <a href={employer.url} class="hover:text-[var(--color-accent)] transition-colors">{employer.company}</a>
+                ) : (
+                  employer.company
+                )}
+                {employer.note && (
+                  <span class="text-sm font-normal text-[var(--color-text-muted)]"> · {employer.note}</span>
+                )}
+              </h3>
+              <span class="text-sm font-mono text-[var(--color-text-muted)] shrink-0">{employer.duration}</span>
+            </div>
+            <div class="flex flex-col gap-6">
+              {employer.roles.map((role) => (
+                <div>
+                  <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
+                    <h4 class="font-semibold text-[var(--color-text-heading)]">
+                      {role.title}
+                      {role.note && (
+                        <span class="text-sm font-normal text-[var(--color-text-muted)]"> · {role.note}</span>
+                      )}
+                    </h4>
+                    <span class="text-sm font-mono text-[var(--color-text-muted)] shrink-0">{role.period}</span>
+                  </div>
+                  <p class="text-sm text-[var(--color-text-muted)] mb-1">{role.location}</p>
+                  {role.description && (
+                    <p class="text-[var(--color-text)] mt-2 leading-relaxed">{role.description}</p>
+                  )}
+                  {role.url && (
+                    <a href={role.url} class="text-sm text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors mt-1 inline-block">{role.url}</a>
+                  )}
+                  {role.tech && (
+                    <div class="flex flex-wrap gap-2 mt-3">
+                      {role.tech.map((t) => (
+                        <span class="text-xs font-mono px-2 py-0.5 rounded bg-[var(--color-bg-surface)] text-[var(--color-text-muted)] border border-[var(--color-border)]">{t}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Education -->
+    <section class="mb-16">
+      <h2 class="text-sm font-mono text-[var(--color-accent)] tracking-wide uppercase mb-8">Education</h2>
+      <div class="flex flex-col gap-6">
+        {education.map((edu) => (
+          <div class="border-l-2 border-[var(--color-border)] pl-6">
+            <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
+              <h3 class="text-lg font-bold text-[var(--color-text-heading)]">{edu.institution}</h3>
+              <span class="text-sm font-mono text-[var(--color-text-muted)] shrink-0">{edu.period}</span>
+            </div>
+            <p class="text-[var(--color-text)]">{edu.degree}</p>
+            {edu.note && (
+              <p class="text-sm text-[var(--color-text-muted)] mt-1">{edu.note}</p>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Publications -->
+    <section class="mb-16">
+      <h2 class="text-sm font-mono text-[var(--color-accent)] tracking-wide uppercase mb-8">Publications</h2>
+      <div class="flex flex-col gap-4">
+        {publications.map((pub) => (
+          <div class="border-l-2 border-[var(--color-border)] pl-6">
+            <div class="flex items-baseline justify-between gap-4">
+              <p class="font-semibold text-[var(--color-text-heading)]">{pub.title}</p>
+              <span class="text-sm font-mono text-[var(--color-text-muted)] shrink-0">{pub.year}</span>
+            </div>
+            <p class="text-sm text-[var(--color-text-muted)]">{pub.authors}</p>
+            <p class="text-sm text-[var(--color-text-muted)]">{pub.venue}</p>
+            <p class="text-xs font-mono text-[var(--color-text-muted)] mt-1">Cited by {pub.citations}</p>
+          </div>
+        ))}
+      </div>
+      <p class="text-sm text-[var(--color-text-muted)] mt-6 pl-6">
+        <a href="https://scholar.google.com/citations?user=ZMxZ2W0AAAAJ&hl=en" class="text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors">View on Google Scholar</a>
+      </p>
+    </section>
+
+    <!-- Awards -->
+    <section>
+      <h2 class="text-sm font-mono text-[var(--color-accent)] tracking-wide uppercase mb-8">Awards</h2>
+      <div class="flex flex-col gap-3">
+        {awards.map((award) => (
+          <div class="border-l-2 border-[var(--color-border)] pl-6">
+            <p class="text-[var(--color-text)]">{award}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  </article>
+</BaseLayout>

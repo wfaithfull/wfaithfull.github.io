@@ -1,0 +1,47 @@
+---
+title: "Feature contributions from PCA"
+date: 2018-11-01
+slug: "/feature-contributions-from-pca"
+tags:
+    - statistics
+    - data-science
+---
+
+I had an interesting discussion on [/r/MachineLearning](https://www.reddit.com/r/MachineLearning/comments/9px83r/d_anomaly_detection_and_causal_analysis/e8bbr3s) the other day. The crux was, having applied PCA to some data and measuring some aspect of the principal components, how would we relate that back to the original data? It should be simple in principle, but I found myself scratching my head.
+
+Recalling that we apply a transformation to move the data into the principal component space:
+
+$$\mathbf{T} = \mathbf{X}\mathbf{W}$$ 
+
+Then the question is, what is the relationship of $\mathbf{T}$ to $\mathbf{X}$? Specifically, given these three matrices, we'd like to know to what extent each feature in $\mathbf{X}$ contributed to each principal component in $\mathbf{T}$.
+
+Of course, the answer lies in $\mathbf{W}$, our matrix of coefficients. The eigenvalues (`latent`) summarise the amount of variance explained by each principal component. We use this to weight $\mathbf{W}$, and then divide through by the total variance inherent in each variable to attain a percentage. 
+
+```
+mu = [1 1 1];
+sigma = [1 0.5 0.5; 0.5 1 0.5; 0.5 0.5 12];
+data = mvnrnd(mu, sigma, 100);
+data = mat2gray(data); % Normalise
+
+[coeff,~,latent] = pca(data);
+
+% Weighted variance
+var = coeff .* (repmat(latent',size(coeff,2),1) .* coeff);
+
+% Divide through by variable totals
+totals = repmat(sum(var,2), 1, size(coeff,1));
+
+contrib = var ./ totals;
+```
+
+Rows of contrib correspond to variables in the original space, columns to principal components. So contrib(m,n) expresses the percentage of variance in variable m explained by principal component n.
+
+```
+>> contrib
+
+contrib =
+
+    0.0340    0.8170    0.1490
+    0.0207    0.4759    0.5034
+    0.9996    0.0004    0.0000
+```
