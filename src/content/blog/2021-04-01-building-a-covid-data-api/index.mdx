@@ -1,0 +1,23 @@
+---
+title: "Building a COVID Data API in a Weekend"
+date: 2021-04-01
+draft: false
+tags:
+  - data-engineering
+  - api
+  - covid
+description: "NHS England published COVID death figures via Excel spreadsheets on a WordPress site. So we built an API."
+---
+
+Over a weekend in April 2021, some friends and I noticed two things:
+
+- NHS England report their official COVID-19 death figures by uploading excel spreadsheets to a WordPress site
+- The reported death figures you see in the media are just the total number of deaths reported that day, not the actual day they happened.
+
+With this in mind, we set about on Saturday evening building an application which:
+
+- Will automatically retrieve, parse and ingest the excel file daily into a database.
+- Expose this via a REST(ish) API.
+- Allow for querying and aggregation over the daily figures, so we can get the actual death totals on the days they occurred.
+
+We pushed it out publicly and put together a Colab notebook showing the basic endpoint and how the data could be used. We kept it up to date for the duration of the crisis, automatically parsing each day's spreadsheet as long as NHS England kept publishing in the same format.

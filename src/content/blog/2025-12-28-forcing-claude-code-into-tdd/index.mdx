@@ -1,0 +1,18 @@
+---
+title: "Forcing Claude Code into TDD"
+date: 2025-12-28
+draft: false
+tags:
+  - ai
+  - tdd
+  - software-engineering
+description: "What actually works when trying to get AI coding agents to follow TDD. Prompting alone isn't enough."
+---
+
+Inspired by Paul Hammond's approach, I've been trying to force Claude Code and Kiro into TDD.
+
+Interestingly, I found prompting and explicit CLAUDE.md instructions alone were not enough to keep it on track on complex features. It bit off more than it could chew in one go - big bang engineering. It wrote tests that wrote the logic under test into the test itself, and tested no units, it got lost in doom loops, I could go on.
+
+I had a lot more success in collaborating up front on a phased plan, that I asked it to write into a `.agents/` directory, and telling it to refer back to it as working memory. It did especially well when I baked TDD thinking into the plan itself.
+
+It's been great fun and incredibly productive, but I can't help but feel that it's still more art than science to get great results out of this workflow. It takes quite a lot of discipline to shift your brain into doing almost nothing but review, it's easy to get lazy.

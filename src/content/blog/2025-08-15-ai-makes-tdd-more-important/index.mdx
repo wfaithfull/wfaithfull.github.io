@@ -1,0 +1,24 @@
+---
+title: "AI Makes TDD More Important, Not Less"
+date: 2025-08-15
+draft: false
+tags:
+  - ai
+  - tdd
+  - software-engineering
+description: "AI-assisted coding increases volume but creates a bottleneck at human understanding. TDD and atomic changes are more important than ever."
+---
+
+Using AI assistance or agents to code dramatically increases the volume of code produced in a given time. Even if that code is good, this introduces a friction point with humans.
+
+The speed at which code can be effectively delivered is (currently) bottlenecked by the rate at which people can *understand* that code. Because for the moment, those people are on the hook to maintain it, fix bugs and so on.
+
+What's more, heavy use of AI assistance can simultaneously increase the output of an individual engineer whilst decreasing the understanding of the code that has been written, exacerbating this problem.
+
+Given the increase in the volume of code that's being delivered, practices that people have been shouting about for decades - TDD and small, atomic changes, have become even more important.
+
+It's easier to human review 5 atomic PRs that do exactly one thing each, with sensible tests, and touch 5 files each than one that touches 25 files.
+
+AI assisted code also suffers from the butterfly effect. A small missing detail or context in the initial prompt for an agent can have disastrous consequences, and the human who set the agent off in the first place may be none the wiser until it gets to review.
+
+If that review gets skimmed because the PR touched too many files and a human was overwhelmed, you can quickly find your quality has nosedived.
