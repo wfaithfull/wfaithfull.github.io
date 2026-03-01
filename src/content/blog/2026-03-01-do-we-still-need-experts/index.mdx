@@ -1,5 +1,5 @@
 ---
-title: "Agents and the Question of Expertise"
+title: "Do We Still Need Experts?"
 date: 2026-03-01
 draft: false
 tags:
@@ -8,9 +8,13 @@ tags:
 description: "Do we need experts any more?"
 ---
 
+<div class="flex justify-center">
+![Michael Gove](michael-gove.avif)
+</div>
+
 "We've had enough of experts", said [Michael Gove in 2016](https://www.ft.com/content/3be49734-29cb-11e6-83e4-abc22d5d108c). A facetious link into a very different subject, but in 2026 we're having the conversation about whether coding agents will supplant the need for technology experts. Maybe he was on to something?
 
-It's been incredible to see the change in the capablities of coding agents over the last 12 months. I myself was taking a much more cautious approach as recently as [last September](/blog/ai-thesis-software-engineering). We'd seen a few "vibe coded" projects up close and were thus very wary about the capabilities of the tooling, despite using it ourselves.
+It's been incredible to see the change in the capabilities of coding agents over the last 12 months. I myself was taking a much more cautious approach as recently as [last September](/blog/ai-thesis-software-engineering). We'd seen a few "vibe coded" projects up close and were thus very wary about the capabilities of the tooling, despite using it ourselves.
 
 However, it can't be denied that a shift is occurring. I have two very close examples from the last two months. In January we were contracted to build a brand new AI startup, and we took this as an opportunity to go all in on AI tools (specifically Claude Code) and really see how fast we could move on a blank slate. The result was spectacular - about 7 weeks later we are pretty much at launch. I wish I could say more, but it's still in stealth mode for the moment. Regardless, 2 engineers and 7 weeks from inception to launch of a robust, secure, AI-powered SaaS product is crazy territory, and certainly wouldn't have been possible 12 months ago. 
 
@@ -58,17 +62,17 @@ Complexity grows unavoidably as a project matures, and that alone drags AI produ
 
 Coding agents replicate whatever patterns they encounter; from the codebase, from the current session, from their own prior output. They don't distinguish particularly well between good patterns and bad ones, because there are so many of both in their training data. Bad patterns propagate just as readily as good ones, and each session that follows them reinforces them further.
 
-This brings me to the next interesting point of discussion - rewrites. Have rewrites suddenly become much more appealing? I recall Joel Spolsky's famous and influential [article](https://www.joelonsoftware.com/2000/04/06/things-you-should-never-do-part-i/) about NetScape where he says:
+This also raises an interesting question about rewrites. If AI productivity degrades on mature codebases, have rewrites suddenly become much more appealing? I recall Joel Spolsky's famous and influential [article](https://www.joelonsoftware.com/2000/04/06/things-you-should-never-do-part-i/) about NetScape where he says:
 
 > They did it by making the single worst strategic mistake that any software company can make:
 > **They decided to rewrite the code from scratch.**
 
 This article had a huge influence on me as an early career software engineer, and still does. I've stuck by this principle for a really long time and it's guided a lot of advice that I've dished out. If you're taking over a mature (read: legacy) project now, does this principle still hold? 
 
-I'm still not sure even with AI you would eagerly try to rewrite a C compiler or a web browser from scratch as per the example. The former is interesting, because Anthropic [recently tried it](https://www.anthropic.com/engineering/building-c-compiler), but, in the process, also revealed the key thing that must be present for such a task to be undertaken, even with AI: an unbelievably well defined and specified suite of tests, such as the GCC torture test suite. And tests are really just programmatic behaviour specification.
+I'm still not sure even with AI you would eagerly try to rewrite a C compiler or a web browser from scratch as per the example. The former is interesting, because Anthropic [recently tried it](https://www.anthropic.com/engineering/building-c-compiler), but, in the process, also revealed the key thing that must be present for such a task to be undertaken, even with AI: an unbelievably well defined and specified suite of tests, such as the GCC torture test suite. And tests are really just programmatic behaviour specification. The AI wrote the compiler, but Anthropic's engineers defined what "correct" meant. The expertise was in the spec.
 
-If you're still here after this rambling, thank you, and let me work my way back around to the main point of the article. **We still need to have really tight requirements for what we're building, and someone needs to be cognisant of them**. Those requirements aren't entirely functional either - it's important, for example, that I know when building on AWS that I want to structure my SaaS platform in a VPC with a public and private subnet, etc. These kind of details are often not chosen by the models themselves, and a non expert would therefore not even know what they didn't know. There will be thousands of such small examples in any project.
+Which brings me back to the main point. **We still need to have really tight requirements for what we're building, and someone needs to be cognisant of them**. Those requirements aren't entirely functional either - it's important, for example, that I know when building on AWS that I want to structure my SaaS platform in a VPC with a public and private subnet, etc. These kinds of details are often not chosen by the models themselves, and a non expert would therefore not even know what they didn't know. There will be thousands of such small examples in any project.
 
-So do we still need experts? In my view yes, and for quite a while yet. But breadth is probably more valuable than depth. These tools are much more productive in expert hands, and much less likely to get bogged down. That 7-week startup build wasn't fast because the agents did all the thinking. It was fast because experienced engineers were steering. 
+So do we still need experts? In my view yes, and for quite a while yet. But compounding experience is probably more valuable than deep specialism. You know to put a VPC around your SaaS not because you're a networking specialist, but because you've seen enough production systems to know what goes wrong. These tools are much more productive in experienced hands, and much less likely to get bogged down. That 7-week startup build wasn't fast because the agents did all the thinking. It was fast because experienced engineers knew which decisions to make upfront.
 
-So, in my view, if you've got some miles on the clock it's actually a pretty exciting time to be working in this space, possibly the most exciting time ever. Perhaps this is the era of the generalist.
+Anyone can start a greenfield project with AI and move fast. The real test is keeping it productive as it matures, and that's where experience compounds. So if you've got some miles on the clock it's actually a pretty exciting time to be working in this space, possibly the most exciting time ever.
