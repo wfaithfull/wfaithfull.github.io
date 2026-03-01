@@ -27,8 +27,48 @@ Secondly, I spent the last few weeks writing (or at least pondering) our AI poli
 > AI makes the "un-fun" parts cheaper. Use this to your advantage.
 > 50/50 ratio - Aim to spend as much time on chores, refactoring, and cleanup as on new features. AI makes tech debt easier to accrue, but also easier to resolve. When resolving tech debt, add tests if they don't already exist.
 
-This is a principle borne of some serious lived experience with these tools now, but why should it even be necessary if you no longer need human expertise involved? Pattern amplification.
+Why 50/50? We've anecdotally observed that AI productivity decays over the lifetime of a project, and that the rate of decay is strongly influenced by codebase quality. Why should this even be necessary if you no longer need human expertise involved? Pattern amplification.
+
+Complexity grows unavoidably as a project matures, and that alone drags AI productivity down over time. There's not much you can do about that. What you can control is quality, and that determines how steep the decline is.
+
+<svg viewBox="0 0 500 320" class="w-full max-w-lg mx-auto my-8" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="areaGood" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.1"/>
+    </linearGradient>
+    <linearGradient id="areaBad" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#ef4444" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#ef4444" stop-opacity="0.08"/>
+    </linearGradient>
+  </defs>
+  <line x1="60" y1="260" x2="460" y2="260" stroke="#525252" stroke-width="1.5"/>
+  <line x1="60" y1="260" x2="60" y2="40" stroke="#525252" stroke-width="1.5"/>
+  <polygon points="460,260 452,256 452,264" fill="#525252"/>
+  <polygon points="60,40 56,48 64,48" fill="#525252"/>
+  <path d="M 60,50 C 180,52 280,70 460,140" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M 60,50 C 180,52 280,70 460,140 L 460,260 L 60,260 Z" fill="url(#areaGood)"/>
+  <path d="M 60,50 C 120,70 180,160 460,248" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M 60,50 C 120,70 180,160 460,248 L 460,260 L 60,260 Z" fill="url(#areaBad)"/>
+  <text x="400" y="130" fill="#38bdf8" font-family="Inter, sans-serif" font-size="11" opacity="0.8">maintained</text>
+  <text x="390" y="243" fill="#ef4444" font-family="Inter, sans-serif" font-size="11" opacity="0.8">neglected</text>
+  <text x="260" y="292" text-anchor="middle" fill="#a3a3a3" font-family="Inter, sans-serif" font-size="13">Project Maturity</text>
+  <text x="20" y="150" text-anchor="middle" fill="#a3a3a3" font-family="Inter, sans-serif" font-size="13" transform="rotate(-90, 20, 150)">AI Productivity</text>
+</svg>
 
 Coding agents replicate whatever patterns they encounter; from the codebase, from the current session, from their own prior output. They don't distinguish particularly well between good patterns and bad ones, because there are so many of both in their training data. Bad patterns propagate just as readily as good ones, and each session that follows them reinforces them further.
 
-So do we still need experts? I think we do, but breadth is probably more valuable than depth. That 7-week startup build wasn't fast because the agents did all the thinking. It was fast because experienced engineers were steering. Perhaps this is the era of the generalist.
+This brings me to the next interesting point of discussion - rewrites. Have rewrites suddenly become much more appealing? I recall Joel Spolsky's famous and influential [article](https://www.joelonsoftware.com/2000/04/06/things-you-should-never-do-part-i/) about NetScape where he says:
+
+> They did it by making the single worst strategic mistake that any software company can make:
+> **They decided to rewrite the code from scratch.**
+
+This article had a huge influence on me as an early career software engineer, and still does. I've stuck by this principle for a really long time and it's guided a lot of advice that I've dished out. If you're taking over a mature (read: legacy) project now, does this principle still hold? 
+
+I'm still not sure even with AI you would eagerly try to rewrite a C compiler or a web browser from scratch as per the example. The former is interesting, because Anthropic [recently tried it](https://www.anthropic.com/engineering/building-c-compiler), but, in the process, also revealed the key thing that must be present for such a task to be undertaken, even with AI: an unbelievably well defined and specified suite of tests, such as the GCC torture test suite. And tests are really just programmatic behaviour specification.
+
+If you're still here after this rambling, thank you, and let me work my way back around to the main point of the article. **We still need to have really tight requirements for what we're building, and someone needs to be cognisant of them**. Those requirements aren't entirely functional either - it's important, for example, that I know when building on AWS that I want to structure my SaaS platform in a VPC with a public and private subnet, etc. These kind of details are often not chosen by the models themselves, and a non expert would therefore not even know what they didn't know. There will be thousands of such small examples in any project.
+
+So do we still need experts? In my view yes, and for quite a while yet. But breadth is probably more valuable than depth. These tools are much more productive in expert hands, and much less likely to get bogged down. That 7-week startup build wasn't fast because the agents did all the thinking. It was fast because experienced engineers were steering. 
+
+So, in my view, if you've got some miles on the clock it's actually a pretty exciting time to be working in this space, possibly the most exciting time ever. Perhaps this is the era of the generalist.
