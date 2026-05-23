@@ -9,27 +9,15 @@ tags:
 description: "Why you cannot compensate for lack of information with more agents: the information-theoretic case for expert steering."
 ---
 
-Last time I wrote about [whether we still need experts](/blog/do-we-still-need-experts), my answer was yes. I gave the reasoning I had: broad vocabulary, lived experience, knowing what to put inside a VPC. All true, all anecdotal. I wanted to come back with the actual argument.
+Last time I wrote about [whether we still need experts](/blog/do-we-still-need-experts), my answer was yes. Thinking about it since, I found myself returning to ideas from my PhD: entropy, mutual information, the data processing inequality. Could those underpin the intuition with something firmer?
 
-Here is the version with maths.
+> *N.B. I'm not pretending to still be a researcher, nor that I've kept a deep grasp of information theory - I did in a past life. I've also used Opus 4.7 to help compile the idea into a grounded argument. The nice thing about publishing on a blog is that none of this has to pass peer review.*
 
-The shorter version, if you stop reading at the next sentence: you cannot compensate for lack of information with more agents. Not because the agents are bad. Because of the data processing inequality.
+The argument: agents are bounded by how much intent we can transmit into them. On long horizons that bound is tight, and agents almost certainly drift from human intent without ongoing steering.
 
 ## The cone
 
-Picture a starting point. From it, the agent makes a choice, then another, then another. Each choice has some distribution over alternatives. Plot all of those branchings forward and you get a cone, narrow at the start, fanning out over time.
-
-The cone has a name in information theory. The whole sequence of actions an agent might take is a trajectory $\tau = (a_1, a_2, \ldots, a_T)$ (read $\tau$ aloud as "tau"). The total uncertainty over that whole sequence is its entropy $H(\tau)$, read aloud as "the entropy of tau." That single number is the cone, expressed as one quantity.
-
-You can think of the agent as picking each next action based on what has happened so far. State $s_t$ at step $t$, action $a_t$ chosen, world advances, state $s_{t+1}$, repeat. That style of policy is called *autoregressive* (each step conditions on the past), and it lets the total uncertainty split cleanly into a sum of per-step uncertainties:
-
-$$
-H(\tau) = \sum_t H(a_t \mid s_t)
-$$
-
-In plain English: each step contributes its own dose of uncertainty to the cone, and the long-horizon uncertainty is just the sum of all those doses. That is why long tasks compound. Each fresh action gets to add fresh uncertainty on top of what was already accumulated.
-
-The cone grows monotonically with horizon. Long task, wide cone. This is what makes "build me a todo app" different from "build me an AI SaaS with four billing tiers, an MCP, and Google Ads integration." Both start at the same point. One ends in a wide grey region of possible futures.
+Picture a starting point. From it, the agent makes a choice, then another, then another. Each choice has some distribution over alternatives. Plot all those branchings forward and you get a cone, narrow at the start, fanning out over time.
 
 <svg viewBox="0 0 500 320" class="w-full max-w-lg mx-auto my-8" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -55,90 +43,108 @@ The cone grows monotonically with horizon. Long task, wide cone. This is what ma
   <text x="20" y="160" text-anchor="middle" fill="#a3a3a3" font-family="Inter, sans-serif" font-size="13" transform="rotate(-90, 20, 160)">Trajectory space</text>
 </svg>
 
+The cone has a formal version. Call the whole sequence of an agent's actions a trajectory $\tau = (a_1, a_2, \ldots, a_T)$ (read $\tau$ aloud as "tau"). Its total uncertainty is the entropy $H(\tau)$ ("the entropy of tau"). That single number *is* the cone. If the agent picks each action conditioned on what came before (an *autoregressive* policy), the chain rule splits the total entropy into a sum of per-step uncertainties:
+
+$$
+H(\tau) = \sum_t H(a_t \mid s_t)
+$$
+
+Each step adds its own dose of uncertainty on top of what's already accumulated, which is why long tasks compound. (Strictly, $s_t$ here is shorthand for the full running context, not a compressed Markov state - that's the safer reading for an LLM agent.)
+
+The cone grows monotonically with horizon. Long task, wide cone. This is what makes "build me a todo app" different from "build me a multi-tenant SaaS with single sign-on, role-based access, audit logging, and a billing system." Even the second prompt leaves huge questions open: what are the pricing tiers, who can see whose data, what does the audit log record and for how long? Every unspecified corner is another direction the cone gets to fan into.
+
+The cone isn't uniform, though. On familiar territory, a well-trained policy has near-zero conditional entropy per step - it's seen the pattern a thousand times and barely needs to choose. In that regime the cone is really a narrow tube hugging the data manifold; it fans wildly only at *novelty boundaries* where the model hasn't seen the pattern, or where several plausible continuations exist and nothing in the prompt picks between them. Boilerplate is a tube. Genuinely new work is a cone.
+
 ## Steering is mutual information
 
-Now overlay the operator. Behind the operator there is a hidden thing $Y$, what they actually want. They cannot show you $Y$ directly. They can only write a prompt $P$, which is a compressed sketch of $Y$ squeezed through their fingers.
+Overlay the operator. They have some hidden $Y$, what they actually want. They can't show $Y$ directly; they can only write a prompt $P$, a compressed sketch of $Y$ squeezed through their fingers.
 
-The question is how much of $Y$ survives the journey. Information theory gives that a name too: *mutual information*, written $I(Y; \tau)$ and read aloud as "the mutual information of Y and tau." It measures how much of one quantity you can read off from another. If $I(Y; \tau)$ is high, watching the agent's trajectory lets you reconstruct what the operator wanted. If it is zero, the agent's output tells you nothing about intent. It could be anything.
+How much of $Y$ survives the journey is what information theory calls *mutual information*, $I(Y; \tau)$ ("the mutual information of Y and tau"). High means you can reconstruct intent from the trajectory; zero means the output tells you nothing about it. Precise prompting, technical vocabulary, and lived experience all raise it - experience because it's a denser encoder, picking the few words that compress the most bits. A senior says "use a VPC with public and private subnets" and packs significant architectural intent into eight words; a junior either doesn't know to say it or spends two paragraphs saying it less precisely.
 
-Precise prompting raises mutual information. Technical vocabulary raises it. Lived experience raises it, because lived experience is a denser encoder: you choose the few words that compress the most bits. A senior engineer says "use a VPC with public and private subnets" and that is twenty bits of architectural intent in eight words. A junior either does not know to say it, or spends two paragraphs saying it less precisely.
+Jeon, Lee, Lei and Van Roy did the [careful version of this](https://arxiv.org/abs/2401.15530) at ICML 2024: error decays at a rate governed by $I(\text{prompt}; \text{task})$, with diminishing returns per additional bit.
 
-This is what I was reaching for in the last post when I said generalist vocabulary helps. The formal version: experience is bandwidth.
+## The prior does some of the work for free
 
-Jeon, Lee, Lei and Van Roy did the [careful version of this argument](https://arxiv.org/abs/2401.15530) at ICML 2024. Error decays at a rate governed by $I(\text{prompt}; \text{task})$. Diminishing returns per additional bit. Each new word in the prompt buys you less than the last.
+The agent isn't a blank slate. It's been trained on an enormous corpus of human-produced text, itself a sample from the distribution of human intent, so some of $Y$ is already encoded into the weights before the prompt is written.
+
+Call those weights $\theta$ ("theta"). The intent-information now splits into two reservoirs:
+
+$$
+I(f(P, \theta); Y) \leq I(P; Y) + I(\theta; Y \mid P)
+$$
+
+"The mutual information of f-of-P-and-theta with Y is at most the mutual information of P and Y, plus the mutual information of theta and Y given P." The `|` reads "given" and means "after accounting for what the prompt already told us."
+
+The model knows things about what humans usually want. "Build me a todo app" is a tiny prompt riding on a much bigger prior - the agent has seen thousands of todo apps and already knows the modal architecture. This is why instruction-tuned models feel surprisingly helpful on common tasks: fitting is explicitly trying to maximise the alignment between $\theta$ and population-average intent.
+
+It cuts the other way too. The prior helps in inverse proportion to how unusual your intent is. Close to the population mean, the weights carry most of the load; in the tail (the taste, the repo-specific idiosyncrasies, the unwritten constraints your team learned the hard way) the prior gives you nothing, and the bits have to come from the prompt. That's where experience pays off: not at expressing population-average intent, but at transmitting the tail intent the prior can't supply.
+
+## What about synthesis at intersections?
+
+A fair pushback: the prior isn't just modal completion. It's a compositional generative model, and LLMs can produce genuinely novel work at the intersection of concepts they've seen. GPT-5.5 cracking an open Erdős problem makes "the prior just gives you the modal answer" sound badly understated.
+
+The tail intent argument survives this, but you have to notice what's actually present in those wins: a crystal-clear target (the conjecture statement is dense intent), a tight verifier (the proof checker says yes or no), and purely behavioural intent (nobody cares what the proof looks like, only whether it checks).
+
+So the honest version: capability synthesis substitutes for human-in-loop bits *only when there's a tight verifier*. Without one, synthesis produces more confident-looking candidates with no way to pick between them. That's why frontier wins cluster in formal-verifier domains (theorem proving, competitive programming, optimisation) and move slower where "works" has a thousand valid solutions and operator taste does the selecting.
 
 ## Specification has a price
 
-Rate-distortion theory gives the price. To keep expected deviation below some tolerance $\varepsilon$, you need $R(\varepsilon)$ bits of specification. $R$ is not linear in task complexity. Small $\varepsilon$, complex task, and $R$ blows up.
+Rate-distortion theory gives the price. To keep expected deviation below tolerance $\varepsilon$ ("epsilon"), you need $R(\varepsilon)$ bits of specification, and $R$ isn't linear: small $\varepsilon$, complex task, $R$ blows up. The context window is finite; if $R(\varepsilon)$ exceeds it, no cleverness closes the cone. Every engineer who's tried to prompt a complete feature has felt this - you say more, you add the corner cases, eventually you compress and abbreviate, and the cone widens on those exact corners.
 
-This is the lived experience of every engineer who has tried to prompt their way to a complete feature. You say more, you say it more carefully, you add the corner cases, and you can feel $R$ climbing faster than your patience.
-
-The context window is finite. Call its capacity $C$. If $R(\varepsilon) > C$, no amount of cleverness will close the cone below $\varepsilon$. You hit the wall.
-
-You start writing the prompt that fully specifies the enterprise-tier billing logic and you realise you have consumed eight thousand tokens and the agent hasn't done anything yet. You compress, you abbreviate, you let some things slide, and now you are below $R(\varepsilon)$ and the cone is going to widen on those exact corners. This is unavoidable. You cannot specify your way out of a complex task within a finite context.
+The bit-count framing also misses something: not every bit is equally useful. A prompt that pins down the high-leverage decisions (architecture, data model, constraints that ripple downstream) is worth far more than one with the same bit count spent on variable naming. Bit *placement* matters more than bit count. Over-specification cuts the other way too, pulling the model off the manifold its prior is good at, into worse outputs than the modal answer would have been. There's a Goldilocks zone, and finding it is its own skill.
 
 ## You cannot fix this with more agents
 
-Which brings me to the section I actually wanted to write.
+The instinct when one agent struggles is to throw more at it: swarms, teams, orchestrator-plus-worker-plus-critic. Parallelism scales capability, but not the dimension that matters when intent is the bottleneck.
 
-The instinct, when one agent struggles, is to throw more agents at it. Swarms. Teams. Multi-agent frameworks. Orchestrator plus worker plus critic plus reviewer plus planner. The premise is that parallelism scales capability.
-
-It does. But only in one direction, and not the one that matters when the bottleneck is intent.
-
-The data processing inequality is the formal version of the rule that you cannot get information out of a system that was never put in. Take any function $f$ you like, anything you do to the prompt: a single agent, a chain of agents, an orchestrator routing tasks, a voting scheme over a swarm, even a wildly clever pipeline you have not invented yet. Call its output $f(P)$. Then:
+The data processing inequality says you can't get information out of a system that was never put in. For any pipeline $f$ (a chain of agents, a voting scheme, anything you build downstream of the prompt):
 
 $$
 I(f(P); Y) \leq I(P; Y)
 $$
 
-In English: whatever you do to the prompt after it has been written, the result cannot share *more* information with operator intent $Y$ than the prompt itself does. Downstream processing can rearrange the bits, lose some, present them better, but it cannot synthesise bits about intent that were never there. You cannot compute your way out of an underspecified objective.
+The output can't share more information with operator intent $Y$ than the prompt did. Processing rearranges and loses bits; it cannot synthesise bits that were never there.
 
-There are three things more agents *can* do, and they are worth naming carefully because they look like exceptions but are not:
+The DPI assumes a *Markov chain* (read "Mark-off") $Y \to P \to f(P)$: intent into prompt, prompt into output, no side channels. If $f$ has its own line to $Y$ (through training, through tool calls, through asking the operator), the chain breaks and the bound relaxes. So DPI bounds the *novel* bits a pipeline can extract beyond what the prior supplies and what the environment can be probed for. That leaves three things more agents can genuinely do:
 
-1. **Variance reduction.** Multiple samples from the same conditional distribution. Useful when your bottleneck is stochasticity around a correct mean. Not useful when you are biased toward the wrong attractor in the first place.
-2. **Genuine new observations.** If each agent goes off and reads a doc, runs a probe, queries a database, executes the code, they pull in new information from outside the original prompt. That adds bits. But it is the act of querying the world that adds them, not the parallelism.
-3. **Active queries to the operator.** [Sadigh et al. (2017)](https://arxiv.org/abs/1810.04303) showed agents can extract more reward signal by asking humans maximally-informative comparisons. Again, the bits come from the operator's answers, not the parallelism.
+1. **Variance reduction around a well-placed prior.** If the posterior over $Y$ is concentrated on the right mode but noisy, sampling and voting helps. The trap: if the prior is on the wrong mode, more samples just consolidate the wrong answer with more confidence.
+2. **Genuine new observations.** Reading a doc, running a probe, executing the code - bits flow in from the world, not from parallelism.
+3. **Active queries to the operator.** [Sadigh et al. (2017)](https://arxiv.org/abs/1810.04303) showed agents can extract more reward signal by asking humans maximally-informative comparisons. Again, the bits come from the operator, not the parallelism.
 
-What more agents fundamentally cannot do:
+What they cannot do is recover intent that was never in the prompt, distinguish competent pursuit of the wrong proxy from the right one ([goal misgeneralisation](https://arxiv.org/abs/2105.14111)), or reduce bias below the mutual-information floor your spec sets.
 
-- Recover intent that was never in the prompt.
-- Distinguish between competent pursuit of the wrong proxy and competent pursuit of the right one. That is [goal misgeneralisation](https://arxiv.org/abs/2105.14111), and it is an empirical fact about every long-running agent system I have seen.
-- Reduce bias below the mutual-information floor set by your spec.
+The Condorcet-jury rebuttal - surely $n$ agents converging beats one - requires *independent* errors. Agents from the same base model on the same prompt have heavily correlated errors. Different personas, different base models, or adversarial critics partially decorrelate them, but you're still sampling from a small region of policy space, still working below the intent ceiling. Variance shrinks; bias barely moves.
 
-There is a tempting Condorcet-jury rebuttal: the wisdom of crowds, surely $n$ agents converging is better than one. The Condorcet result requires *independent* errors. Agents drawn from the same base model and given the same prompt do not have independent errors. They have heavily correlated errors. You are not building a juror panel; you are sampling one juror $n$ times. The variance shrinks. The bias does not move.
+## Memory helps, but only with the stationary part
 
-If your swarm of agents is producing impressive-looking work that keeps subtly diverging from what you actually wanted, the bottleneck is not throughput. The bottleneck is the bits of intent you have transmitted into the system. Adding more agents is, mathematically, the wrong intervention.
+Doesn't agentic memory close the gap? It helps, but partially. The *stationary* part of intent (coding style, repo conventions, the architectural decisions you've already made, the team's accumulated preferences) gets captured and persists across sessions - the slow accumulation of a personal prior, the same prior a senior colleague builds up by being around for a couple of years. What memory can't capture is the part of intent that hasn't happened yet. Humans don't fully know what they want until they see a candidate. [Inverse Reward Design](https://arxiv.org/abs/1711.02827) makes this formal: the spec is *evidence about* the operator's latent reward, not the reward itself. [Cooperative IRL](https://arxiv.org/abs/1606.03137) treats the loop as a game where the agent continuously infers a drifting reward.
 
-## Memory doesn't close it either
-
-The natural follow-up is: surely agentic memory closes the gap? An agent that remembers every past interaction has all the bits of intent the operator has ever produced.
-
-It doesn't help. Memory captures *past* intent. The cone problem stems partly from intent being non-stationary: humans don't know what they want until they see it. [Inverse Reward Design](https://arxiv.org/abs/1711.02827) makes this formal: the spec the operator writes is *evidence about* their latent reward, not the reward itself. [Cooperative IRL](https://arxiv.org/abs/1606.03137) treats the whole loop as a game where the agent continuously infers an evolving reward.
-
-Even an oracle with infinite memory cannot close the cone, because the operator-side distribution itself is moving. The iterative loop (prompt, observe, correct, prompt again) is not a workaround for primitive tools. It is the only way to add bits at the rate at which intent resolves.
+Memory shores up the stationary part; the iterative loop (prompt, observe, correct, prompt again) handles the non-stationary residue. Neither replaces the other.
 
 ## What we actually see
 
-If this argument is right, we should observe reliability decaying with horizon even as raw capability rises. Compounding error in long chains. Goal misgeneralisation on underspecified tasks. All of which we do see.
-
-METR's [task horizon work](https://arxiv.org/abs/2503.14499) (Kwa, West et al. 2025) measured a doubling every roughly seven months in the length of task a frontier model can complete with 50% success. Worth celebrating. Except they also measured that the *80%-reliability horizon is roughly five times shorter than the 50% horizon for the same model*. Reliability collapses long before capability does. The cone matters more than the mean.
-
-Dziri et al.'s [Faith and Fate](https://arxiv.org/abs/2305.18654) found roughly exponential accuracy decay with reasoning depth on compositional tasks: four-digit multiplication near zero accuracy while two-digit is near one hundred. DeepMind's [specification gaming catalogue](https://deepmind.google/discover/blog/specification-gaming-the-flip-side-of-ai-ingenuity/) has documented something like ninety cases of agents satisfying the literal spec while violating intent.
-
-This is the empirical signature of a cone that widens faster than bits can be supplied.
+If the argument is right, reliability should decay with horizon even as raw capability rises, with goal misgeneralisation showing up on underspecified tasks. We do see this. METR's [task horizon work](https://arxiv.org/abs/2503.14499) (Kwa, West et al. 2025) measured a doubling every roughly seven months in the length of task a frontier model can complete with 50% success - but also that the 80%-reliability horizon is roughly five times shorter than the 50% horizon for the same model. Reliability collapses long before capability does. Dziri et al.'s [Faith and Fate](https://arxiv.org/abs/2305.18654) showed roughly exponential accuracy decay with reasoning depth on compositional tasks; DeepMind's [specification gaming catalogue](https://deepmind.google/discover/blog/specification-gaming-the-flip-side-of-ai-ingenuity/) lists around ninety cases of agents satisfying the literal spec while violating intent. The empirical signature of a cone widening faster than bits can be supplied.
 
 ## The controller view
 
-What is the expert actually doing? Acting as a controller on a stochastic process. [LLMPC (Maher 2025)](https://arxiv.org/abs/2501.02486) makes the analogy explicit: LLM planning as model-predictive control. The operator observes the emerging trajectory, identifies divergence early, and injects high-bandwidth corrections at the moments where they compress the most bits-per-token. [Korbak, Perez and Buckley (2022)](https://arxiv.org/abs/2205.11275) showed that KL-regularised RL is variational Bayesian inference: the base model is a prior, every reward signal is evidence updating it. The operator at the wheel is doing the same thing in real time.
+The expert is a controller on a stochastic process. [LLMPC (Maher 2025)](https://arxiv.org/abs/2501.02486) makes the analogy explicit: LLM planning as model-predictive control. The operator watches the trajectory, identifies divergence early, and injects high-bandwidth corrections at the moments where they compress the most bits-per-token. [Korbak, Perez and Buckley (2022)](https://arxiv.org/abs/2205.11275) framed KL-regularised RL as variational Bayesian inference: the base model is a prior, every reward signal updates it; the operator at the wheel does the same in real time. A few well-timed words from a senior outperform a swarm because the senior is injecting bits at the points where the agent is about to fork into the wrong cone.
 
-This is why a few well-timed words from a senior engineer outperform a swarm. Not because the swarm is incompetent. Because the senior is injecting bits at exactly the points where the agent is about to fork into the wrong cone.
+Experience is bandwidth. Timing is amplification.
 
-Experience is bandwidth, and timing is amplification.
+## Two flavours of intent
+
+Split $Y$ into two pieces; the argument applies very differently to each. $Y_\text{behavioural}$ ("Y-behavioural") is what the system should *do* - externally verifiable, testable, the acceptance criteria. $Y_\text{aesthetic}$ ("Y-aesthetic") is *how* it should do it: which abstractions feel right, when to add a flag versus refactor, whether this is the moment for a generic helper or three almost-identical copies. The thousand small choices that compound into "this codebase has soul" or "this codebase reads like it was generated on a Tuesday".
+
+$Y_\text{behavioural}$ compresses cheaply - write the tests and the bits flow in through a channel that isn't the prose prompt, with the test suite acting as a constant correction signal. $Y_\text{aesthetic}$ has no easy compression. You can't write a test for "this should look like Will wrote it". Those bits come from in-band steering, from a human who's seen enough of your work to encode the taste in a sentence at the right moment.
+
+Expert steering matters most where intent resists testification. Specify in tests where you can; save the prose bandwidth for the taste.
 
 ## So, do we still need experts?
 
-Last time I argued yes from vibes. The maths gives the same answer.
+Last time I argued yes from vibes. The maths gives the same answer with a bit more shape.
 
-You cannot compensate for lack of information with more agents. Not because the agents are bad. Because the data processing inequality is what it is. Throwing more compute downstream of an impoverished prompt does not synthesise the bits you never sent.
+The prior gets you the modal answer for free; the tail is where experts earn their keep, and the only channel for tail intent is the prompt, tests, tool returns, or a human at the wheel correcting in real time. Adding more agents doesn't change that - the DPI is the DPI. The practical version of the claim is narrower than the mathematical one, though. It bites hardest when intent really is the binding constraint, and current agentic systems often lose bits to other things first: hallucination, planning failures, attention drift, bad orchestration. It also assumes the model could do the task if it knew what you wanted; for work beyond current capability, more bits won't help. What's left is the regime where the model could do the task but is picking wrong from many valid candidates. That's most professional software engineering.
 
-If your team feels like it is spinning up more agents and getting subtly worse outcomes, that is not a tooling problem. That is the data processing inequality, billing you for the bits you never sent.
+A few directions this could turn out wrong. If execution improves vastly while specification stays the same, intent bandwidth was never the binding constraint. If elicitation interfaces compress more intent into fewer tokens, the expert zone shrinks. RLHF keeps folding operator preferences back into $\theta$, so today's tail becomes tomorrow's modal. The argument survives all three; those are just the places I'd watch.
+
+If your team feels like it's spinning up more agents and getting subtly worse outcomes, sometimes that's not a tooling problem. Sometimes it's the data processing inequality, billing you for the bits you never sent.
