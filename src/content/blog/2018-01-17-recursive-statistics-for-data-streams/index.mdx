@@ -9,7 +9,9 @@ tags:
 
 If you ever have to process an indeterminate length stream of data, it's useful to be able to compute some basic statistics as you go. The key phrase there is *as you go* - we could easily compute a mean of an arbitrary number of samples $N$
 
-$$ \bar{x} = \frac{1}{N} \sum_{i=1}^N x\_i $$
+$$
+\bar{x} = \frac{1}{N} \sum_{i=1}^N x_i
+$$
 
 but that means we have to keep $N$ examples in memory! That's $O(N)$ space complexity, which for very a large $N$ is unacceptable.
 
@@ -23,7 +25,9 @@ Fortunately, we can compute the recursive mean given
 
 Then all we need to do is as follows. (Note that the use of $i-1$ is [Bessel's correction](https://en.wikipedia.org/wiki/Bessel%27s_correction))
 
-$$ \bar{x}_i = \frac{(i-1) \times \bar{x}\_{i-1} + x\_i}{i} $$
+$$
+\bar{x}_i = \frac{(i-1) \times \bar{x}_{i-1} + x_i}{i}
+$$
 
 Starting with $\bar{x}_1 = 0$. Note that we "start" from $1$ to avoid division by zero. Think of it as counting the number of observations so far. We can't calculate anything until we've seen at least one anyway. Simple python example:
 
@@ -55,11 +59,15 @@ for x in [random.uniform(-10,10) for _ in range(10)]:
 
 To calculate the variance, we also need the sum of the squares of the of the data points from $0..i$.
 
-$$ \sigma^2\_i = \frac{\sum x^2_i}{i} - \bar{x}^2\_i $$
+$$
+\sigma^2_i = \frac{\sum x^2_i}{i} - \bar{x}^2_i
+$$
 
 Then the standard deviation is simply the square root of the variance.
 
-$$ \sigma\_i = \sqrt{\sigma^2\_i} $$
+$$
+\sigma_i = \sqrt{\sigma^2_i}
+$$
 
 It is simple to add this into our python sample:
 
@@ -102,7 +110,7 @@ Something I've also had to deal with in multivariate streams is a recursive esti
 I repeat that this provides an *estimation* of the sample covariance - you will obviously calculate a different covariance matrix if you took all the points and calculated it classically. But if you can fit all points in memory then what's the point of doing this?
 
 $$
-C_i(x,y) = C\_{i-1} (x,y) \cdot (i-1) + \frac{(x\_i - \bar{x}\_i)(y\_i - \bar{y}\_{i-1})}{i}
+C_i(x,y) = C_{i-1} (x,y) \cdot (i-1) + \frac{(x_i - \bar{x}_i)(y_i - \bar{y}_{i-1})}{i}
 $$
 
 Here is an example Java implementation from a stream clusterer I am writing:
