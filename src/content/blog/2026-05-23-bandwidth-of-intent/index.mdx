@@ -9,11 +9,11 @@ tags:
 description: "Why you cannot compensate for lack of information with more agents: the information-theoretic case for expert steering."
 ---
 
-Last time I wrote about [whether we still need experts](/blog/do-we-still-need-experts), my answer was yes. Thinking about it since, I found myself returning to ideas from my PhD: entropy, mutual information, the data processing inequality. Could those underpin the intuition with something firmer?
+A startup called Polsia (which, I notice, spells *aislop* backwards) recently launched on the promise of autonomous AI that builds and runs your whole company while you sleep. You give it an idea, the platform handles coding, marketing, customer acquisition, support, and iteration, and it keeps going while you disengage. Founder Ben Broca's example of how this works in practice: he let the AI raise its own funding round. "I sent to 150 investors an email saying my AI is raising the round and it would reply automatically." The reasoning model underneath, by the way, is Claude.
 
-> *N.B. I'm not pretending to still be a researcher, nor that I've kept a deep grasp of information theory - I did in a past life. I've also used Opus 4.7 to help compile the idea into a grounded argument. The nice thing about publishing on a blog is that none of this has to pass peer review.*
+I don't really buy this premise (future egg, meet face), but it was hard to put my finger *precisely* on why. Last time I wrote about [whether we still need experts](/blog/do-we-still-need-experts) and my answer was yes. But this was somewhat anecdotal, and fuzzy - based on feeling and intuition. How can I articulate my intuition more precisely? I found myself returning to information theory ideas I studied during my PhD: entropy, mutual information, the data processing inequality. This thought process is the remainder of this post. I'll come back to Polsia at the end.
 
-The argument: agents are bounded by how much intent we can transmit into them. On long horizons that bound is tight, and agents almost certainly drift from human intent without ongoing steering.
+> *N.B. I'm not pretending to still be a researcher, nor that I've kept a deep grasp of information theory - I did in a past life. I've also used Opus 4.7 to help compile the idea into a grounded argument. The nice thing about publishing on a blog is that none of this has to pass peer review (except from Opus).*
 
 ## The cone
 
@@ -53,7 +53,7 @@ Each step adds its own dose of uncertainty on top of what's already accumulated,
 
 The cone grows monotonically with horizon. Long task, wide cone. This is what makes "build me a todo app" different from "build me a multi-tenant SaaS with single sign-on, role-based access, audit logging, and a billing system." Even the second prompt leaves huge questions open: what are the pricing tiers, who can see whose data, what does the audit log record and for how long? Every unspecified corner is another direction the cone gets to fan into.
 
-The cone isn't uniform, though. On familiar territory, a well-trained policy has near-zero conditional entropy per step - it's seen the pattern a thousand times and barely needs to choose. In that regime the cone is really a narrow tube hugging the data manifold; it fans wildly only at *novelty boundaries* where the model hasn't seen the pattern, or where several plausible continuations exist and nothing in the prompt picks between them. Boilerplate is a tube. Genuinely new work is a cone.
+The cone isn't uniform, though. On familiar territory, a well-trained policy has near-zero conditional entropy per step - it's seen the pattern a thousand times and barely needs to choose. It mostly expands at *novelty boundaries* where the model hasn't seen the pattern, or where several plausible continuations exist and nothing in the prompt picks between them. 
 
 ## Steering is mutual information
 
@@ -73,7 +73,7 @@ $$
 I(f(P, \theta); Y) \leq I(P; Y) + I(\theta; Y \mid P)
 $$
 
-"The mutual information of f-of-P-and-theta with Y is at most the mutual information of P and Y, plus the mutual information of theta and Y given P." The `|` reads "given" and means "after accounting for what the prompt already told us."
+In plain English: this bound considers two sources of operator intent for the agent - the prompt, and what the weights learned during training - and says the most intent the agent's output can carry from those is what each contributes, with the weights counted only for the bits the prompt didn't already supply. (There are other channels too, which we'll get to.)
 
 The model knows things about what humans usually want. "Build me a todo app" is a tiny prompt riding on a much bigger prior - the agent has seen thousands of todo apps and already knows the modal architecture. This is why instruction-tuned models feel surprisingly helpful on common tasks: fitting is explicitly trying to maximise the alignment between $\theta$ and population-average intent.
 
@@ -81,39 +81,57 @@ It cuts the other way too. The prior helps in inverse proportion to how unusual 
 
 ## What about synthesis at intersections?
 
-A fair pushback: the prior isn't just modal completion. It's a compositional generative model, and LLMs can produce genuinely novel work at the intersection of concepts they've seen. GPT-5.5 cracking an open Erdős problem makes "the prior just gives you the modal answer" sound badly understated.
+I appreciate this sounds so far like the "stochastic parrots" argument. It's not; LLMs can produce genuinely novel work at the intersection of concepts they've seen. [GPT-5.5 cracking an open Erdős problem](https://www.erdosproblems.com/forum/thread/AI%20Contributions) recently, and [the team of agents building a C compiler](https://www.anthropic.com/engineering/building-c-compiler), for example.
 
-The tail intent argument survives this, but you have to notice what's actually present in those wins: a crystal-clear target (the conjecture statement is dense intent), a tight verifier (the proof checker says yes or no), and purely behavioural intent (nobody cares what the proof looks like, only whether it checks).
+The tail intent argument survives this, but you have to notice what's common in these wins: a crystal-clear target, a tight verifier, and purely behavioural intent (it's only validated on whether it works, not what it looks like).
 
-So the honest version: capability synthesis substitutes for human-in-loop bits *only when there's a tight verifier*. Without one, synthesis produces more confident-looking candidates with no way to pick between them. That's why frontier wins cluster in formal-verifier domains (theorem proving, competitive programming, optimisation) and move slower where "works" has a thousand valid solutions and operator taste does the selecting.
+So in my view, synthesis substitutes for human-in-loop bits most strongly when there's a tight verifier. Without one, synthesis produces more confident-looking candidates with no way to pick between them - widening the cone.
 
 ## Specification has a price
 
-Rate-distortion theory gives the price. To keep expected deviation below tolerance $\varepsilon$ ("epsilon"), you need $R(\varepsilon)$ bits of specification, and $R$ isn't linear: small $\varepsilon$, complex task, $R$ blows up. The context window is finite; if $R(\varepsilon)$ exceeds it, no cleverness closes the cone. Every engineer who's tried to prompt a complete feature has felt this - you say more, you add the corner cases, eventually you compress and abbreviate, and the cone widens on those exact corners.
+[Rate-distortion theory](https://en.wikipedia.org/wiki/Rate–distortion_theory) deals with the trade-off between rate (how many bits you use to encode something) and distortion (how much error you accept when decoding it). To keep expected deviation below tolerance $\varepsilon$ ("epsilon"), you need $R(\varepsilon)$ bits of specification - the entropy of the source (here, operator intent) at tolerance $\varepsilon$. $R$ isn't linear: small $\varepsilon$, complex task, $R$ blows up. The context window is finite; if $R(\varepsilon)$ exceeds it, no cleverness closes the cone. Every engineer who's tried to prompt a complete feature has felt this - you say more, you add the corner cases, eventually you compress and abbreviate, and the cone widens on those exact corners.
 
 The bit-count framing also misses something: not every bit is equally useful. A prompt that pins down the high-leverage decisions (architecture, data model, constraints that ripple downstream) is worth far more than one with the same bit count spent on variable naming. Bit *placement* matters more than bit count. Over-specification cuts the other way too, pulling the model off the manifold its prior is good at, into worse outputs than the modal answer would have been. There's a Goldilocks zone, and finding it is its own skill.
 
-## You cannot fix this with more agents
+This interacts with the prior in a useful way. The relevant quantity isn't really $R(\varepsilon)$ but $R_{Y|\theta}(\varepsilon)$ - the rate-distortion function *conditional* on what the prior already knows. For modal tasks, that's vanishingly small: "todo app" is a few bytes that decompress into thousands of bits of expected behaviour because both sides share the codebook. The prompt is pointer-style addressing, not transmission from scratch. For tail tasks where the prior gives you nothing, $R_{Y|\theta}(\varepsilon) \approx R(\varepsilon)$ and you pay full price.
 
-The instinct when one agent struggles is to throw more at it: swarms, teams, orchestrator-plus-worker-plus-critic. Parallelism scales capability, but not the dimension that matters when intent is the bottleneck.
+## What if context were infinite?
 
-The data processing inequality says you can't get information out of a system that was never put in. For any pipeline $f$ (a chain of agents, a voting scheme, anything you build downstream of the prompt):
+Imagine an agent with infinite context and perfect attention. No chunking, no memory, no retrieval - it holds every word you've ever said and every artefact you've produced.
+
+Does the argument still bite?
+
+Yes. Stripping out the context constraint clarifies what the argument is actually about. Five things survive the thought experiment:
+
+- **DPI.** Bounds intent the agent knows by what was actually transmitted. More room ≠ more bits.
+- **Articulation.** Tacit intent (Polanyi: "we know more than we can tell") resists being written down at any length. $Y_\text{aesthetic}$ in particular.
+- **Non-stationarity.** Humans don't know what they want until they see a candidate. Infinite context carries every past bit perfectly; future bits haven't been generated yet.
+- **No verifier.** Most consequential work has no tight verifier. Context size doesn't conjure one.
+- **Absent operator.** No operator in the loop means no $Y$ to track, no matter the context size.
+
+The next two sections exist because context is finite. Neither is the argument; both are engineering responses to a constraint we're imagining away.
+
+## More agents is not more information
+
+The instinct when one agent struggles is to throw more at it: swarms, teams, orchestrator-plus-worker-plus-critic. Parallelism scales capability, not bandwidth.
+
+The data processing inequality says you can't extract information that was never there. For any pipeline $f$ downstream of the prompt (a chain, a voting scheme, anything you can build):
 
 $$
 I(f(P); Y) \leq I(P; Y)
 $$
 
-The output can't share more information with operator intent $Y$ than the prompt did. Processing rearranges and loses bits; it cannot synthesise bits that were never there.
+Whatever $f$ does, it can't share more information with intent $Y$ than the prompt did. Processing rearranges and loses bits; it doesn't manufacture them.
 
-The DPI assumes a *Markov chain* (read "Mark-off") $Y \to P \to f(P)$: intent into prompt, prompt into output, no side channels. If $f$ has its own line to $Y$ (through training, through tool calls, through asking the operator), the chain breaks and the bound relaxes. So DPI bounds the *novel* bits a pipeline can extract beyond what the prior supplies and what the environment can be probed for. That leaves three things more agents can genuinely do:
+DPI assumes a Markov chain $Y \to P \to f(P)$: no side channels. Side channels (training, tool calls, asking the operator) break the chain and relax the bound. So DPI bounds the *novel* bits a pipeline can extract beyond the prior and the environment. That leaves three things more agents genuinely do:
 
-1. **Variance reduction around a well-placed prior.** If the posterior over $Y$ is concentrated on the right mode but noisy, sampling and voting helps. The trap: if the prior is on the wrong mode, more samples just consolidate the wrong answer with more confidence.
-2. **Genuine new observations.** Reading a doc, running a probe, executing the code - bits flow in from the world, not from parallelism.
-3. **Active queries to the operator.** [Sadigh et al. (2017)](https://arxiv.org/abs/1810.04303) showed agents can extract more reward signal by asking humans maximally-informative comparisons. Again, the bits come from the operator, not the parallelism.
+1. **Variance reduction around a well-placed prior.** Sampling and voting help when the posterior is on the right mode but noisy. If the prior is on the wrong mode, more samples just consolidate the wrong answer.
+2. **Genuine new observations.** Reading a doc, running a probe, executing the code - bits flow in from the world.
+3. **Active queries to the operator.** [Sadigh et al. (2017)](https://arxiv.org/abs/1810.04303) showed agents can extract more reward signal by asking humans maximally-informative comparisons. Bits come from the operator.
 
-What they cannot do is recover intent that was never in the prompt, distinguish competent pursuit of the wrong proxy from the right one ([goal misgeneralisation](https://arxiv.org/abs/2105.14111)), or reduce bias below the mutual-information floor your spec sets.
+They cannot recover intent that was never in the prompt, distinguish competent pursuit of the wrong proxy from the right one ([goal misgeneralisation](https://arxiv.org/abs/2105.14111)), or push bias below the mutual-information floor the spec sets.
 
-The Condorcet-jury rebuttal - surely $n$ agents converging beats one - requires *independent* errors. Agents from the same base model on the same prompt have heavily correlated errors. Different personas, different base models, or adversarial critics partially decorrelate them, but you're still sampling from a small region of policy space, still working below the intent ceiling. Variance shrinks; bias barely moves.
+The [Condorcet-jury rebuttal](https://en.wikipedia.org/wiki/Condorcet%27s_jury_theorem) - surely $n$ agents converging beats one - requires *independent* errors. Same base model, same prompt, heavily correlated errors. Different personas, different base models, or adversarial critics partially decorrelate, but you're still sampling a small region of policy space below the intent ceiling. Variance shrinks; bias barely moves.
 
 ## Memory helps, but only with the stationary part
 
@@ -147,4 +165,14 @@ The prior gets you the modal answer for free; the tail is where experts earn the
 
 A few directions this could turn out wrong. If execution improves vastly while specification stays the same, intent bandwidth was never the binding constraint. If elicitation interfaces compress more intent into fewer tokens, the expert zone shrinks. RLHF keeps folding operator preferences back into $\theta$, so today's tail becomes tomorrow's modal. The argument survives all three; those are just the places I'd watch.
 
-If your team feels like it's spinning up more agents and getting subtly worse outcomes, sometimes that's not a tooling problem. Sometimes it's the data processing inequality, billing you for the bits you never sent.
+## Back to Polsia
+
+The bandwidth-of-intent argument is the precise shape of what Polsia is betting against. The strongest version of the pitch isn't "agents replace founder"; it's "agents handle the 95% of company-running that's behavioural and routine, founder stays in the loop for the strategic spine". There's something to that at the task level. Where it breaks is the bit where the founder "sleeps" - where the system runs for hours, days, or weeks without operator steering. Every step in that interval is a step further into the wide grey region of the cone, and there's no verifier that catches strategic drift before revenue does, which is to say years too late.
+
+The deeper question isn't whether the maths checks out, though. It's a simpler thing the maths is pointing at. *Whose intent does an autonomous company even track?*
+
+The founder is, by their own description, removed from the loop. The investors are an intent source, but at lower bandwidth - and the AI in this case is talking *to* the investors, not *from* them. The market is feedback, not intent. By the time the verifier speaks (revenue, retention, attrition) the system has been drifting from any intent at all for some time. IRD and CIRL formalised this for ordinary tasks; what Polsia exposes is that at organisational scale there may simply not be a $Y$ for the system to track that doesn't decay over time. The intent isn't underspecified. It's structurally absent.
+
+That's the harder problem, and it's the one I think the autonomous-company premise has to answer before the engineering question is even worth having. *Who is this company for, on what terms, and where is the signal that says so?* Without an answer to that, the agents are confidently competent in a direction nobody chose.
+
+If your team feels like it's spinning up more agents and getting subtly worse outcomes, sometimes that's not a tooling problem. Sometimes it's the data processing inequality, billing you for the bits you never sent. And once you remove the operator from the loop entirely, you're not paying for missing bits any more. You're paying for the absence of someone to send them.
