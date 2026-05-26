@@ -18,7 +18,7 @@ I don't claim that we're the most AI-native software engineering team or that we
 
 ## When did we make the change?
 
-We have been experimenting with AI coding tools as long as they've been around. We treated them with reverence, caution and some level of suspicion probably until the Q4 2025. We had seen first hand the impact of the "vibe coding" craze and were not particularly impressed. What changed in Q4 2025? We started working with Claude Code, and importantly, we took on a piece of work with a hot AI startup backed by Silicon Valley investors and very much with the Silicon Valley mindset towards AI. It was during this piece of work that our suspicions were confirmed that the tooling had reached a level of maturity where it was important that we adopted, or got left behind. 
+We have been experimenting with AI coding tools as long as they've been around. We treated them with reverence, caution and some level of suspicion probably until Q4 2025. We had seen first hand the impact of the "vibe coding" craze and were not particularly impressed. What changed in Q4 2025? We started working with Claude Code, and importantly, we took on a piece of work with a hot AI startup backed by Silicon Valley investors and very much with the Silicon Valley mindset towards AI. It was during this piece of work that our suspicions were confirmed that the tooling had reached a level of maturity where it was important that we adopted, or got left behind. 
 
 ## How did we do it?
 
@@ -48,6 +48,8 @@ Our adoption has gone very smoothly, with pretty much universal approval of the 
 
 **Most of our code is now written by AI**
 I don't have exact stats on this number, but I expect it is in excess of 90% over the last few months. The trouble with this statement is that it's assumed therefore that engineers aren't actually paying attention to it or tweaking it - that's not the case. Just that most code now is being delivered through claude code sessions (or indeed other harnesses).
+
+**No more Figma** Frontend designs and mockups are now built almost exclusively by developers in HTML&CSS. The frontend design landscape has fundamentally changed and it's trivial for engineers to build and share interactive prototypes and designs. Good frontend design skills still matter! Frontend specialists make much better UIs that others, but the design process has been democratised - anyone can produce a design and ask a frontend person to run their experience over it.
 
 **More smoke testing than we did before** The volume of code changes coexisting now has driven us to a greater proportion of smoke tests, just to help mitigate that risk of integrating lots of work together in a short time. This is a practical response to the observation that lots of AI coding agents each working from a different thread of thought through the codebase can often trip over each other in sneaky ways that you are now less likely to catch at review time. It's never been cheaper to setup and write smoke tests, for example with something like [Playwright](playwright.dev).
 
