@@ -1,0 +1,66 @@
+---
+title: "How ExaDev Adopted AI Coding Tools"
+date: 2026-05-24
+draft: false
+tags:
+  - ai
+  - engineering
+  - culture
+  - exadev
+description: "A braindump on how we've adopted AI coding tools across the business. What was already in place that made it easy, what we had to change, and why I think the blockers for most teams are cultural rather than technical."
+---
+
+I work in a [coworking space](https://fraserhousehub.co.uk/home?&v=latest) in Lancaster. As a result of having a portion of our team here, and us being out in the hot desking area, we're frequently overheard working and collaborating. As such it's no secret that we've heavily adopted AI coding tools and have done some impressive things with them this year, such as getting a B2B SaaS startup from zero to market in a matter of months. 
+
+I've had several instances of people asking me to talk them through *how* we've managed this transition, and also talk to their software engineering teams about how they can do it. This post is a bit of a braindump along those themes, reflecting roughly what I've told them.
+
+I don't claim that we're the most AI-native software engineering team or that we're market leaders in that respect, but we've seen a significant productivity impact.
+
+## When did we make the change?
+
+We have been experimenting with AI coding tools as long as they've been around. We treated them with reverence, caution and some level of suspicion probably until the Q4 2025. We had seen first hand the impact of the "vibe coding" craze and were not particularly impressed. What changed in Q4 2025? We started working with Claude Code, and importantly, we took on a piece of work with a hot AI startup backed by Silicon Valley investors and very much with the Silicon Valley mindset towards AI. It was during this piece of work that our suspicions were confirmed that the tooling had reached a level of maturity where it was important that we adopted, or got left behind. 
+
+## How did we do it?
+
+Slowly (for us, anyway) and cautiously. I know this might not be the most popular of approaches, but my view was that I needed to roll this out to our lead engineers alone for some time, then our senior engineers some time later, before we rolled it out universally. This might rightly be percieved as unfair, but my point in undertaking this unfair, trickle-down process was to make sure that our leadership layer had developed a fabric of experience, and also a united view of how to work with these tools before we pushed it down a layer. The intention is that each layer of experience coaches the one below through pair work, so if you want consistent application you have to make the top level consistent. I was also worried about the impact it might have on our more junior colleagues ability to learn. Perhaps this fear was overblown, but I felt this might be their last few months of practice in actually building solutions and solving problems on their own. Who is to say how valuable that is? We followed this process over a few months.
+
+## What was already true, and ended up being load-bearing
+
+Our adoption has gone very smoothly, with pretty much universal approval of the tools from engineers and clients. Our productivity has gone through the roof by almost any standard of measurement, as has our capacity for parallel work. I suspect, however, that the reasons for this are less because we have special individuals and much more to do with the structural tailwinds of how our business is set up, which far predate AI tools. What factors do I think were most significant?
+
+**Small teams.** Our biggest engagement is three full time equivalent engineers. AI multiplies one engineer's throughput, and in a small team that compounds visibly. In bigger teams it disappears into coordination overhead. Smaller T-shaped teams overdelivering has always been a feature of our approach. Our business model is deliberately built around the sweet spot where communication overhead stays manageable, and AI happens to land most cleanly in that same sweet spot. 
+
+**Culture of trust, leadership team as player-coaches** We try to empower people to work independently, trust them, and our more senior members are player-coaches. We trust people and support them / swarm onto problems when they make mistakes. 
+
+**Major/Minor.** We have a system where engineers have, like U.S. college degrees, one major project and several minors. Engaging one of us engages all of us. We value context switching, cross-pollination and parallel tracks - people are trained for it.
+
+**Principles, not process.** All principles, no ceremonies. We try to take the Agile Manifesto at face value. We are used to adapting to the specific demands of each project or client and solving it through collaboration rather than process. 
+
+**Continuous Delivery** We always approach software delivery in thin vertical slices, and put an extraordinary amount of effort into automated testing and deployments. We naturally work in a way that produces good guardrails for delivering software with AI. We like TDD, and that's helped!
+
+**Decentralised, heads up engineers** We value engineers who define their own roadmap, take an interest in the product or business, have an opinion about it at least. ExaDev engineers don't sit quietly waiting for an exhaustively specified ticket to be written for them. As the bottleneck shifts with AI, this ability to define your own work has become ten times as important.
+
+**T-shaped engineers.** We were already convinced breadth wins. AI accelerates breadth more than depth, because knowing what to ask for and being able to evaluate the answer is the new bottleneck. Transferable, slowly. It's a hiring posture more than a flick of a switch.
+
+**Few information slios, stream-of-consciousness communications** Every project at ExaDev has the same communication shape - a `*-log` channel for stream-of-consciousness information radiation from engineers, an `*-integrations` channel for PRs, deployments etc. It's as simple as that. We'll track tickets somewhere (maybe github or Linear), but we've always treated those channels as a continuous stream of working memory for the team. It's therefore very easy for anyone (including AI tools) to access the context on a new project. 
+
+## What did change
+
+**Most of our code is now written by AI**
+I don't have exact stats on this number, but I expect it is in excess of 90% over the last few months. The trouble with this statement is that it's assumed therefore that engineers aren't actually paying attention to it or tweaking it - that's not the case. Just that most code now is being delivered through claude code sessions (or indeed other harnesses).
+
+**More smoke testing than we did before** The volume of code changes coexisting now has driven us to a greater proportion of smoke tests, just to help mitigate that risk of integrating lots of work together in a short time. This is a practical response to the observation that lots of AI coding agents each working from a different thread of thought through the codebase can often trip over each other in sneaky ways that you are now less likely to catch at review time. It's never been cheaper to setup and write smoke tests, for example with something like [Playwright](playwright.dev).
+
+**Code review.** As I looked at one of our repos with 20+ open PRs on it (and seemingly rising every day), most of our work was getting logjammed in a review queue. We grudgingly accepted that we can no longer have human eyes on every line of code that ships. We'll typically do multiple rounds of AI code review (we have a GitHub actions review bot), which tends to be an adverserial process between the agent on the developer's machine and the bot.
+
+**Our understanding of what AI can do** Beyond adopting AI coding tools, we're actually incorporating them into internal agents in some of our startups that can do some incredible things 99% autonomously such as building data ingest pipelines, summarising logs, analysing data. The important thing is a cultural understanding that you can't treat AI output uncritically, and understanding where your human-in-the-loop step is. Amazon Bedrock in AWS means you can do some incredible things on AWS without ever leaving their data centre.
+
+**Caution scales with risk.** We can't have a one-size-fits-all policy on this - your caution depends on the risk. On an ISO-certified B2B SaaS with big customers and SLAs we are far more cautious in respect of code review than we are on a pre-revenue, pre-customer startup. In small teams, engineers can assess business risk directly and adapt, rather than applying one bar across everything. AI lets us push that dial further in both directions than we could before, which is genuinely useful.
+
+**Monorepos.** Most of our projects now live in a single repo with infrastructure-as-code, backend, frontend, and every service together. Monorepos simplify AI context gathering, and enable changes to be end-to-end vertical slices. This used to be a psychological bottleneck based on vertical experience ("I'm a frontend person, I shouldn't touch the backend etc.") but AI helps break down those barriers and make everyone more T-shaped, as long as there's suitable experience tuned into the project.
+
+**A `docs/` folder in every repo.** We tried to standardise a pattern for docs across all our projects. The shift is treating that folder as a first-class artifact the AI reads as readily as the code.
+
+## Can anyone do it?
+
+Yes, with caveats. I'll finish on an interesting anecdote. I got chatting a couple of months ago to some engineers who worked in a UK government department. I asked them if they used AI coding tools in their day to day work. They said yes - their department had just rolled out Claude Code. I was impressed that the government had actually got over the bureaucratic and infosec hurdles. I asked as a follow up question, whether it was making them more productive. To paraphrase (because I can't remember an exact quote) the answer was something like "No, because even if I deliver a feature in 2 hours that would have taken me a week, it still has to get signed off by the CAB (Change Advisory Board)". Apocryphal as this may be, I think it illustrates nicely my current thinking on the subject, which is that the blockers to organisations adopting AI coding tools are mostly organisational and cultural.
