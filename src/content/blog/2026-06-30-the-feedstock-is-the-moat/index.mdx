@@ -1,0 +1,50 @@
+---
+title: "The Feedstock Is the Moat"
+date: 2026-06-30
+draft: false
+tags:
+  - ai
+  - engineering
+  - culture
+  - exadev
+  - agile
+description: "AI made code generation cheap and made context the scarce input. The teams that win the AI-native era won't be the ones with the best models - everyone has those. They'll be the ones already organised so that reality writes itself down."
+---
+
+Most software teams treat the backlog as the source of truth. The board, the roadmap, the tickets - that's where "where we are" supposedly lives, and a great deal of organisational energy goes into forcing reality to match the plan. I think this is exactly backwards. And AI has quietly turned a long-standing preference of ours into something that looks a lot like a structural advantage.
+
+At ExaDev we invert it. Reality on the ground is gospel. We keep backlogs and roadmaps, but they take a back seat - they're expected to dance to the tune of reality, not the other way around. When the ground shifts, the tickets follow. We never mistake the map for the territory. This is the same instinct that led us to [ditch sprints](/blog/why-we-ditched-sprints) years ago: artificial structure imposed on top of reality tends to distort it rather than describe it.
+
+So if the backlog isn't our source of truth, what is? It's the running commentary. Every project we run has the same shape - a `*-log` channel where engineers radiate a stream of consciousness (what they're building, what they just learned, what broke this morning, what they're about to merge) and an `*-integrations` channel for the automated exhaust of PRs, deployments and alerts. We've [written before](/blog/how-weve-adopted-ai) about treating those channels as the team's working memory. The log is noisy by design. It's the instrument panel. Between status meetings, most teams are flying blind; we're flying on instruments.
+
+For years I'd have justified all this in human terms: transparency, low coordination overhead, psychological safety, the ability to pick up a project without sitting through a meeting. All true. But something shifted when we went properly AI-native, and it took me a while to see it clearly.
+
+## The bottleneck moved
+
+Here's the thing nobody quite says out loud. AI has made generating code cheap. What it has *not* made cheap is context - an accurate, current, machine-readable picture of intent, state, decisions, and the why behind them. An agent is only ever as good as the context you can hand it. The scarce input is no longer typing. It's a faithful picture of reality.
+
+Now look at where most organisations keep their truth. It lives in people's heads. It lives in meetings that were never written down. It lives in a board that lags reality by a week and is half-fiction anyway. None of that is legible to a machine. You can buy every team a coding agent tomorrow and it will still be starved, because the feedstock it needs to do good work simply doesn't exist in a form it can read.
+
+Our way of working produces that feedstock as exhaust. We didn't design it for AI - it predates these tools by well over a decade - but read it back with this lens:
+
+- **Information radiation is a live corpus.** Continuously updated, high-signal, sitting in plain text. The log channel is, functionally, a retrieval store and the agent's working memory. Point an agent at the repo plus the log and it has the real state of the project.
+- **Our commits and PR comments explain reasoning, not just changes.** The why and the constraints - the thing agents are worst at inferring - are already captured, in writing, by the people who made the call.
+- **Reality-as-source-of-truth is the agent's own epistemics.** It reads the live code and the live logs. A team that treats a stale backlog as gospel is handing its agents a fiction, then acting surprised when the output is wrong.
+
+It compounds, too. More radiation means better context, which means faster and better output, which means more to radiate. The corpus is an appreciating asset.
+
+## Why most teams won't catch up
+
+This is the part I keep coming back to. The tooling is commoditised. Anyone can buy Claude Code on Tuesday. What they can't buy is the substrate that makes it work: a decade-long habit of writing everything down, ego-free transparency, and the psychological safety to think out loud in public where you might be wrong.
+
+Most incumbents have the exact inverse. Truth lives in meetings and heads. The backlog is treated as authoritative. Process exists as a control mechanism. And in a low-trust environment nobody narrates their thinking, because being visibly wrong gets punished - so the one resource AI needs most is the one their culture actively suppresses. A good deal of what *does* get written down is political cover, which to a model is just noise.
+
+You can't retrofit this in a quarter. It's organisational physics, not a tooling gap, and culture has brutal path dependence. They'll adopt the tool, starve it, and wonder why the productivity numbers don't move. (I told the story elsewhere of the [government engineer](/blog/how-weve-adopted-ai) whose two-hour feature still waited a week for the Change Advisory Board. Same disease, different organ.)
+
+So the uncomfortable conclusion for the industry, and the comfortable one for us: the feedstock is the moat, not the model. We were building it long before it had a name.
+
+## The honest caveat
+
+I don't want to oversell this, because the advantage is conditional. It holds only as long as we keep it true. The moment the signal-to-noise in those channels rots into idle chatter, the corpus stops being useful - to humans or machines. And it stays latent unless we deliberately wire it into how our agents work: memory, retrieval, skills, automated review. A pile of high-quality context sitting unread in Slack isn't a moat. It's just a nice Slack.
+
+So I treat it as a focus area, not a birthright. But I'm increasingly convinced that the teams who win the AI-native era won't be the ones with the best models - everyone has those. They'll be the ones who, by luck or design, were already organised so that reality writes itself down.
