@@ -1,7 +1,7 @@
 ---
 title: "Reality Is the Source of Truth"
 subtitle: "Information radiation as the AI-native advantage"
-date: 2026-06-30
+date: 2026-07-02
 draft: false
 tags:
   - ai
@@ -11,9 +11,7 @@ tags:
 description: "Some thinking I'm still working through: that the scarce input in AI-native development is context rather than code, and that a long habit of information radiation may matter more than the tools a team adopts."
 ---
 
-This is something I'm still working through, so treat it as a thesis rather than a settled view.
-
-Most software teams treat the backlog as the source of truth. The board, the roadmap and the tickets are taken as the record of where a project is, and a fair amount of effort goes into keeping reality aligned to them. We seem to have drifted to the opposite arrangement, where the work itself is the source of truth and the backlog is a secondary, lossy summary that we update to follow reality rather than the other way round. I'm not sure we ever decided this deliberately. It's more that it's what survived. It's the same instinct that led us to [stop running sprints](/blog/why-we-ditched-sprints).
+Most software teams, consciously or unconsciously, treat the backlog as the source of truth. The board, the roadmap and the tickets are taken as the record of where a project is, and a fair amount of effort goes into keeping reality aligned to them. We seem to have drifted to the opposite arrangement, where the work itself is the source of truth and the backlog is a secondary, lossy summary that we update to follow reality rather than the other way round. It's the same instinct that led us to [stop running sprints](/blog/why-we-ditched-sprints).
 
 In practice the real record lives in a `*-log` channel on every project, where engineers keep up a more or less continuous account of what they're doing, what they've found, what's broken, and what they're about to merge - a habit usually called information radiation - alongside an `*-integrations` channel for the automated traffic of pull requests, builds and deployments. I've [described this before](/blog/how-weve-adopted-ai) as the team's working memory. It's deliberately noisy, and the point of it is that anyone can read back through it and reconstruct where a project actually is without needing a meeting.
 
@@ -31,14 +29,12 @@ We seem to produce that material as a by-product of how we already work - not by
 - Our commit messages and pull request comments tend to record why a decision was made, not only what changed, which happens to be the part an agent is least able to infer on its own.
 - Treating the live system as the source of truth is roughly how an agent operates anyway: it reads the code and the logs. Give it a stale backlog instead and the errors tend to be confident rather than obvious.
 
+A log has another useful property. A stream of consciousness carries a rough sense of its own freshness: what's being discussed right now is usually what matters right now, and older entries recede without anyone having to prune them. The resource largely maintains itself, rather than decaying the way a backlog does, where a card can sit near the top of the board for months - stale, but still presented as current. And because the log is a shared space where several people think out loud at once, it captures far more relevant context than filtering and structuring the same information into tickets ever could. Much of what matters never makes it onto a card at all.
+
 ## Why I suspect this is hard to copy
 
 I want to be careful here, because it would be easy to overclaim. The tools themselves are now widely available and not much of a differentiator. The harder thing to acquire, as far as I can tell, is the way of working underneath them, which in our case took well over a decade to settle: writing things down by default, little enough ego that people don't mind doing it in public, and enough trust that they'll think out loud where others can see.
 
-Many organisations are arranged in close to the opposite way, usually for reasons that made sense at the time. Knowledge sits in meetings and in individuals. The backlog is treated as authoritative. Process exists largely to manage risk. And where being wrong in public carries a cost, people tend to stop narrating their reasoning, which removes much of the material an agent would otherwise have drawn on. Some of what does get written down is written defensively, and carries little signal. None of this strikes me as easily reversed, and I'd tentatively attribute more of the variation in how much teams get out of AI to this than to the tools they've chosen. The [government engineer I mentioned previously](/blog/how-weve-adopted-ai), who could write a feature in two hours but still waited a week for a change board, looks to me like an instance of the same thing.
+Many organisations are arranged in close to the opposite way, usually for reasons that made sense at the time. Knowledge sits in meetings and in individuals. The backlog is treated as authoritative. Process exists largely to manage risk. And where being wrong in public carries a cost, people tend to stop narrating their reasoning, which removes much of the material an agent would otherwise have drawn on. Some of what does get written down is written defensively, and carries little signal. None of this strikes me as easily reversed, and I'd tentatively attribute more of the variation in how much teams get out of AI to this than to the tools they've chosen.
 
 So my tentative conclusion is that the durable advantage, if there is one, is less the model than the accumulated, machine-readable record a team's information radiation leaves behind. We appear to have been building that for a long time without realising what it would later be good for.
-
-## Where I might be wrong
-
-I hold this loosely. It only holds while the record stays worth reading; if the channels fill with noise, the signal degrades for people and models alike. It also does nothing on its own, in that the context has to be deliberately connected to the way the agents work, through memory, retrieval and review, or it simply sits there. And I may be overweighting our own experience. We're a small team, and small teams seem to get more out of these tools for reasons that have little to do with how they communicate. What would move this from a hunch to something I'd argue more firmly is seeing the pattern hold across teams quite unlike ours.
